@@ -1,13 +1,26 @@
-# Claude Code 通用工作流系统 (增强版)
+# Claude Code 工作流系统
 
-## 🎯 概述
+> 🚀 **专业的Claude Code自动化工作流系统** - 基于四阶段理念的智能任务执行框架，专为长时间任务和复杂项目设计。
+
+## 🎯 项目概述
 
 这是一套基于"深度讨论-规划确认-自动执行-质量验收"四阶段理念的Claude Code自动化工作流系统，专为长时间任务(24H+)设计，强调任务讨论和用户确认机制。
+
+## ✨ 核心特性
+
+- 🔰 **强制讨论机制** - 确保完全理解用户需求，避免误解
+- 📋 **用户确认书** - 明确授权和责任，防止执行偏差
+- 🎯 **歧义点预先澄清** - 在执行前消除所有可能的不确定性
+- 🛡️ **完整风险预案** - 为每个已识别风险制定应对策略
+- 🎖️ **质量前置标准** - 在执行前明确质量要求和验收标准
+- 🤖 **智能重试机制** - 多层限制，避免无限重试，指数退避策略
+- 📊 **实时监控系统** - 全面的系统资源和执行状态监控
+- 🔄 **任务恢复管理** - 支持从任意恢复点恢复执行状态
 
 ## 📁 文件夹结构
 
 ```
-claude-workflow-template/
+claude-code-workflow-template/
 ├── README.md                       # 本文件 - 系统概述
 ├── USAGE_GUIDE.md                  # 详细使用指南
 ├── template-docs/                  # 工作流模板文档 (增强版)
@@ -314,11 +327,65 @@ claude "我确认同意开始执行，请严格按照确认书执行"
 - 可以分享你的使用案例和经验
 - 参与模板和脚本的完善
 
+## 🚀 快速开始
+
+### 安装和使用
+```bash
+# 克隆本仓库
+git clone https://github.com/x-rush/claude-code-workflow-template.git
+
+# 进入目录
+cd claude-code-workflow-template
+
+# 复制模板到你的项目
+cp -r template-docs/ scripts/ /path/to/your/project/
+
+# 创建必要的工作目录
+mkdir -p STATE_BACKUPS ERROR_REPORTS QUALITY_REPORTS logs
+```
+
+### 5分钟快速体验
+```bash
+# 1. 开始任务讨论
+claude "我需要执行长时间任务，请按照 TASK_DISCUSSION_TEMPLATE.md 开始详细讨论"
+
+# 2. 生成执行计划确认书
+claude "基于讨论结果，请按 EXECUTION_PLAN_CONFIRMATION.md 生成执行计划确认书"
+
+# 3. 启动任务执行
+claude "我确认同意开始执行，请严格按照确认书执行"
+```
+
+详细使用说明请查看 [快速启动指南](QUICK_START_GUIDE.md)。
+
+## 📈 路线图
+
+- [ ] **v2.1** - 支持更多编程语言的项目模板
+- [ ] **v2.2** - Web界面管理控制台
+- [ ] **v2.3** - 团队协作功能
+- [ ] **v3.0** - AI辅助项目管理功能
+
+## 🤝 支持和反馈
+
+这套工作流系统是开源的，欢迎根据你的项目需求进行修改和扩展。如有问题或建议，请通过项目的issue系统反馈。
+
+### 贡献指南
+- 🎯 欢迎提交改进建议和bug报告
+- 📝 可以分享你的使用案例和经验
+- 🔧 参与模板和脚本的完善
+- ⭐ 给项目一个星标以示支持
+
+### 使用统计
+- 📊 **项目Stars**: [![GitHub stars](https://img.shields.io/github/stars/x-rush/claude-code-workflow-template.svg)](https://github.com/x-rush/claude-code-workflow-template)
+- 🍴 **项目Forks**: [![GitHub forks](https://img.shields.io/github/forks/x-rush/claude-code-workflow-template.svg)](https://github.com/x-rush/claude-code-workflow-template)
+- 📥 **下载量**: [![GitHub release (latest by date)](https://img.shields.io/github/v/release/x-rush/claude-code-workflow-template)](https://github.com/x-rush/claude-code-workflow-template/releases)
+
 ---
 
-**版本**: 2.0 (增强版)
-**更新时间**: 2025-10-06
-**兼容性**: Claude Code CLI
+**版本**: 2.0 (增强版) | **许可证**: MIT | **维护者**: [x-rush](https://github.com/x-rush)
+
+**更新时间**: 2025-10-06 | **兼容性**: Claude Code CLI | **状态**: 🟢 生产就绪
+
 **主要改进**: 新增深度讨论机制、用户确认书、执行前检查清单、智能重试和恢复系统
 
 ## 📖 详细文档

@@ -1,0 +1,54 @@
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 临时文件
+*.tmp
+*.temp
+*.log
+*.bak
+*.swp
+*.swo
+*~
+
+# 工作流运行时产生的文件
+STATE_BACKUPS/
+ERROR_REPORTS/
+QUALITY_REPORTS/
+logs/
+RECOVERY_POINTS/
+MONITOR_DASHBOARD.md
+EXECUTION_STATUS.json
+EXECUTION_LOG.md
+RETRY_LOG.md
+ALERT_HISTORY.md
+MONITOR_LOG.md
+
+# 编辑器文件
+.vscode/
+.idea/
+*.sublime-*
+ Atom/
+.vscode/
+
+# Node.js (如果有)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python (如果有)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# 备份文件
+*.backup
+*.old
