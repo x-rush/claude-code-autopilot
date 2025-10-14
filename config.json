@@ -1,0 +1,104 @@
+{
+  "version": "1.0",
+  "project": {
+    "name": "Claude Code 工作流系统",
+    "description": "专业的Claude Code自动化工作流系统",
+    "created": "2025-10-14",
+    "maintainer": "x-rush"
+  },
+  "paths": {
+    "status_file": "EXECUTION_STATUS.json",
+    "error_log": "ERROR_REPORT.md",
+    "execution_log": "EXECUTION_LOG.md",
+    "monitor_log": "MONITOR_LOG.md",
+    "alert_history": "ALERT_HISTORY.md",
+    "dashboard": "MONITOR_DASHBOARD.md",
+    "health_log": "HEALTH_CHECK_LOG.md",
+    "retry_log": "RETRY_LOG.md",
+    "recovery_log": "RECOVERY_LOG.md",
+    "backup_dir": "BACKUPS",
+    "recovery_points_dir": "RECOVERY_POINTS",
+    "state_backups_dir": "STATE_BACKUPS",
+    "error_reports_dir": "ERROR_REPORTS",
+    "quality_reports_dir": "QUALITY_REPORTS",
+    "logs_dir": "logs"
+  },
+  "monitoring": {
+    "interval_seconds": 60,
+    "alert_cooldown_seconds": 300,
+    "task_timeout_threshold_seconds": 1800,
+    "health_check_interval_seconds": 60,
+    "log_rotation_size_bytes": 10485760,
+    "max_log_files": 5
+  },
+  "retry": {
+    "max_total_retries": 10,
+    "max_retry_per_task": 3,
+    "delay_base_seconds": 30,
+    "delay_max_seconds": 1800,
+    "backoff_strategy": "exponential"
+  },
+  "thresholds": {
+    "api_error_threshold": 5,
+    "network_error_threshold": 3,
+    "disk_usage_warning_percent": 90,
+    "memory_usage_warning_percent": 90,
+    "cpu_load_warning_threshold": 2.0,
+    "task_completion_slow_threshold_hours": 2,
+    "task_completion_slow_percent": 20
+  },
+  "network": {
+    "ping_target": "google.com",
+    "api_check_url": "https://api.openai.com",
+    "connection_timeout_seconds": 5
+  },
+  "quality": {
+    "overall_score_weight": 40,
+    "validation_pass_rate_weight": 30,
+    "user_experience_weight": 20,
+    "maintainability_weight": 10,
+    "minimum_acceptable_score": 7.0
+  },
+  "recovery": {
+    "max_recovery_points": 20,
+    "max_backups": 20,
+    "auto_recovery_enabled": true,
+    "recovery_point_retention_days": 30
+  },
+  "logging": {
+    "level": "INFO",
+    "format": "timestamp",
+    "console_output": true,
+    "file_output": true,
+    "rotate_on_size": true,
+    "rotate_on_startup": false
+  },
+  "execution": {
+    "max_concurrent_tasks": 1,
+    "pause_on_error": true,
+    "auto_save_interval_seconds": 300,
+    "confirmation_required": true
+  },
+  "notifications": {
+    "enabled": false,
+    "email": {
+      "enabled": false,
+      "smtp_server": "",
+      "smtp_port": 587,
+      "username": "",
+      "password": "",
+      "from_address": "",
+      "to_addresses": []
+    },
+    "webhook": {
+      "enabled": false,
+      "url": "",
+      "timeout_seconds": 10
+    }
+  },
+  "security": {
+    "encrypt_sensitive_data": false,
+    "access_log_enabled": false,
+    "audit_trail_enabled": true
+  }
+}
