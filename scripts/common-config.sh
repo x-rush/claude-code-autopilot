@@ -109,8 +109,7 @@ ensure_directories() {
 
 # 检查必要的依赖
 check_dependencies() {
-    local mandatory_deps=("jq" "claude" "curl" "ping" "date" "stat")
-    local optional_deps=("bc" "awk" "nproc")
+    local mandatory_deps=("jq" "claude" "curl" "ping" "date" "stat" "realpath" "awk")
 
     local missing_mandatory=()
     local missing_optional=()
@@ -122,22 +121,10 @@ check_dependencies() {
         fi
     done
 
-    # 检查可选依赖
-    for dep in "${optional_deps[@]}"; do
-        if ! command -v "$dep" &> /dev/null; then
-            missing_optional+=("$dep")
-        fi
-    done
-
     # 报告缺失的必需依赖
     if [[ ${#missing_mandatory[@]} -gt 0 ]]; then
         echo -e "${RED}错误: 缺少必需的依赖工具: ${missing_mandatory[*]}${NC}" >&2
         return 1
-    fi
-
-    # 报告缺失的可选依赖
-    if [[ ${#missing_optional[@]} -gt 0 ]]; then
-        echo -e "${YELLOW}警告: 缺少可选的依赖工具: ${missing_optional[*]}，某些功能可能受限${NC}"
     fi
 
     return 0

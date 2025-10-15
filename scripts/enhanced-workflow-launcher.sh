@@ -20,7 +20,7 @@ WORKFLOW_STATUS_FILE="$PROJECT_ROOT/ENHANCED_WORKFLOW_STATUS.json"
 REQUIREMENT_ALIGNMENT_FILE="$PROJECT_ROOT/REQUIREMENT_ALIGNMENT.json"
 EXECUTION_PLAN_FILE="$PROJECT_ROOT/EXECUTION_PLAN.json"
 TODO_TRACKER_FILE="$PROJECT_ROOT/TODO_TRACKER.json"
-EXECUTION_LOG_FILE="$PROJECT_ROOT/ENHANCED_EXECUTION_LOG.md"
+# 使用common-config.sh中定义的EXECUTION_LOG_FILE
 
 # =============================================================================
 # 日志函数
@@ -145,8 +145,11 @@ EOF
 start_deep_discussion() {
     log_autopilot_workflow "ALIGNMENT" "开始深度需求讨论阶段"
 
-    # 生成深度讨论启动命令
-    local discussion_command="claude \"我将为你执行一个复杂的项目，为了确保完美执行，我需要先进行深度需求讨论。
+    # 生成深度讨论启动命令 - 使用外部模板文件确保语法正确
+    local discussion_command_file="$PROJECT_ROOT/START_DISCUSSION_COMMAND.txt"
+
+    cat > "$discussion_command_file" << 'COMMAND_EOF'
+claude "我将为你执行一个复杂的项目，为了确保完美执行，我需要先进行深度需求讨论。
 
 ## 🎯 深度需求讨论流程
 
@@ -174,16 +177,23 @@ start_deep_discussion() {
 
 **这个深度讨论结束后，我将生成完整的执行计划，然后开始24小时无人值守执行。**
 
-你准备好开始深度需求讨论了吗？\"
+你准备好开始深度需求讨论了吗？"
+COMMAND_EOF
 
     log_autopilot_workflow "INFO" "深度讨论命令已准备"
     echo -e "${CYAN}=== 深度需求讨论阶段 ===${NC}"
     echo -e "${YELLOW}请在新的终端中执行以下命令开始深度讨论：${NC}"
     echo ""
-    echo -e "${GREEN}$discussion_command${NC}"
+    echo -e "${GREEN}$(cat "$discussion_command_file")${NC}"
     echo ""
-    echo -e "${CYAN}深度讨论完成后，请执行：${NC}"
-    echo -e "${GREEN}$0 --complete-discussion${NC}"
+    echo -e "${CYAN}💡 提示：${NC}"
+    echo -e "  - 可以直接复制上面的命令到新终端执行"
+    echo -e "  - 参考 ${YELLOW}template-docs/REQUIREMENT_ALIGNMENT.md${NC} 进行结构化讨论"
+    echo -e "  - 深度讨论完成后，执行：${GREEN}$0 --complete-discussion${NC}"
+    echo ""
+
+    # 清理临时文件
+    rm -f "$discussion_command_file"
 }
 
 # 完成深度讨论
@@ -193,10 +203,13 @@ complete_deep_discussion() {
     # 检查需求对齐文件是否存在
     if [[ ! -f "$REQUIREMENT_ALIGNMENT_FILE" ]]; then
         log_autopilot_workflow "ERROR" "需求对齐文件不存在，请确保深度讨论完成"
+        echo -e "${RED}❌ 未找到需求对齐文件: $REQUIREMENT_ALIGNMENT_FILE${NC}"
+        echo -e "${YELLOW}请先完成深度需求讨论并生成REQUIREMENT_ALIGNMENT.json文件${NC}"
         return 1
     fi
 
     log_autopilot_workflow "SUCCESS" "深度需求讨论完成，准备生成执行计划"
+    echo -e "${GREEN}✅ 深度需求讨论阶段完成${NC}"
     return 0
 }
 
@@ -208,7 +221,10 @@ generate_execution_plan() {
     log_autopilot_workflow "PLANNING" "开始生成详细执行计划"
 
     # 生成执行计划生成命令
-    local planning_command="claude \"基于我们的深度需求讨论结果，我现在需要生成详细的执行计划。
+    local planning_command_file="$PROJECT_ROOT/GENERATE_PLAN_COMMAND.txt"
+
+    cat > "$planning_command_file" << 'COMMAND_EOF'
+claude "基于我们的深度需求讨论结果，我现在需要生成详细的执行计划。
 
 请按照以下结构生成执行计划：
 
@@ -235,16 +251,23 @@ generate_execution_plan() {
 - 整体质量验证标准
 - 自我检查频率
 
-**请生成完整的EXECUTION_PLAN.json文件，包含所有这些信息。生成完成后，我将基于此计划开始真正的无人值守执行。\""
+**请生成完整的EXECUTION_PLAN.json文件，包含所有这些信息。生成完成后，我将基于此计划开始真正的无人值守执行。"
+COMMAND_EOF
 
     log_autopilot_workflow "INFO" "执行计划生成命令已准备"
     echo -e "${CYAN}=== 执行计划生成阶段 ===${NC}"
     echo -e "${YELLOW}请在新的终端中执行以下命令生成执行计划：${NC}"
     echo ""
-    echo -e "${GREEN}$planning_command${NC}"
+    echo -e "${GREEN}$(cat "$planning_command_file")${NC}"
     echo ""
-    echo -e "${CYAN}执行计划生成完成后，请执行：${NC}"
-    echo -e "${GREEN}$0 --complete-planning${NC}"
+    echo -e "${CYAN}💡 提示：${NC}"
+    echo -e "  - 参考 ${YELLOW}template-docs/EXECUTION_PLAN.md${NC} 了解详细结构要求"
+    echo -e "  - 确保生成完整的EXECUTION_PLAN.json文件"
+    echo -e "  - 执行计划生成完成后，执行：${GREEN}$0 --complete-planning${NC}"
+    echo ""
+
+    # 清理临时文件
+    rm -f "$planning_command_file"
 }
 
 # 完成执行计划
@@ -254,6 +277,8 @@ complete_execution_planning() {
     # 检查执行计划文件是否存在
     if [[ ! -f "$EXECUTION_PLAN_FILE" ]]; then
         log_autopilot_workflow "ERROR" "执行计划文件不存在，请确保计划生成完成"
+        echo -e "${RED}❌ 未找到执行计划文件: $EXECUTION_PLAN_FILE${NC}"
+        echo -e "${YELLOW}请先生成详细的EXECUTION_PLAN.json文件${NC}"
         return 1
     fi
 
@@ -278,6 +303,7 @@ complete_execution_planning() {
 EOF
 
     log_autopilot_workflow "SUCCESS" "执行计划生成完成，TODO总数: $total_todos"
+    echo -e "${GREEN}✅ 执行计划生成完成，共规划 $total_todos 个TODO任务${NC}"
     return 0
 }
 
@@ -289,7 +315,10 @@ start_autonomous_execution() {
     log_autopilot_workflow "EXECUTION" "开始真正无人值守执行"
 
     # 生成无人值守执行命令
-    local execution_command="claude \"执行计划已生效，我现在开始真正的无人值守执行。
+    local execution_command_file="$PROJECT_ROOT/START_EXECUTION_COMMAND.txt"
+
+    cat > "$execution_command_file" << COMMAND_EOF
+claude "执行计划已生效，我现在开始真正的无人值守执行。
 
 ## 🚀 无人值守执行启动
 
@@ -314,13 +343,20 @@ start_autonomous_execution() {
 - 安全事件实时记录
 - 进度和质量实时更新
 
-**我现在开始24小时无人值守执行，严格按照执行计划进行，确保最终结果完全符合我们的深度讨论和执行计划要求。\""
+**我现在开始24小时无人值守执行，严格按照执行计划进行，确保最终结果完全符合我们的深度讨论和执行计划要求。"
+COMMAND_EOF
 
     log_autopilot_workflow "INFO" "无人值守执行命令已生成"
     echo -e "${CYAN}=== 真正无人值守执行阶段 ===${NC}"
     echo -e "${YELLOW}请在新的终端中执行以下命令启动无人值守执行：${NC}"
     echo ""
-    echo -e "${GREEN}$execution_command${NC}"
+    echo -e "${GREEN}$(cat "$execution_command_file")${NC}"
+    echo ""
+    echo -e "${CYAN}🔥 重要提示：${NC}"
+    echo -e "  - ${RED}此阶段将开始完全无人值守执行${NC}"
+    echo -e "  - Claude将严格按照EXECUTION_PLAN.json执行"
+    echo -e "  - 可以通过 ${GREEN}$0 --status${NC} 实时查看进度"
+    echo -e "  - 所有操作都在安全边界内进行"
     echo ""
 
     # 更新配置以启用真正的自动执行
@@ -330,6 +366,9 @@ start_autonomous_execution() {
     start_background_monitors
 
     log_autopilot_workflow "SUCCESS" "无人值守执行已启动"
+
+    # 清理临时文件
+    rm -f "$execution_command_file"
 }
 
 # 更新配置支持无人值守
@@ -367,7 +406,8 @@ start_background_monitors() {
                 "$SCRIPT_DIR/safety-boundary.sh" --status >> "$PROJECT_ROOT/SAFETY_MONITOR_LOG.md" 2>&1
             done
         ) &
-        log_autopilot_workflow "INFO" "安全边界监控已启动 (PID: $!)"
+        local safety_pid=$!
+        log_autopilot_workflow "INFO" "安全边界监控已启动 PID: $safety_pid"
     fi
 
     # 启动进度监控
@@ -377,7 +417,8 @@ start_background_monitors() {
             update_execution_progress
         done
     ) &
-    log_autopilot_workflow "INFO" "进度监控已启动 (PID: $!)"
+    local progress_pid=$!
+    log_autopilot_workflow "INFO" "进度监控已启动 PID: $progress_pid"
 }
 
 # 更新执行进度
@@ -395,7 +436,7 @@ update_execution_progress() {
             .workflow_info.last_update = "$(get_iso_timestamp)"
         ' "$WORKFLOW_STATUS_FILE" > temp_status.json && mv temp_status.json "$WORKFLOW_STATUS_FILE"
 
-        log_autopilot_workflow "INFO" "执行进度更新: $completed/$total ($progress%)"
+        log_autopilot_workflow "INFO" "执行进度更新: $completed/$total $progress%"
     fi
 }
 
@@ -409,23 +450,28 @@ show_autopilot_status() {
 
     if [[ -f "$WORKFLOW_STATUS_FILE" ]]; then
         echo -e "${CYAN}工作流信息:${NC}"
-        jq -r '.workflow_info | to_entries[] | "  \(.key): \(.value)"' "$WORKFLOW_STATUS_FILE"
+        echo "  会话ID: $(jq -r '.workflow_info.session_id' "$WORKFLOW_STATUS_FILE" 2>/dev/null || echo "未知")"
+        echo "  开始时间: $(jq -r '.workflow_info.start_time' "$WORKFLOW_STATUS_FILE" 2>/dev/null || echo "未知")"
+        echo "  状态: $(jq -r '.workflow_info.status' "$WORKFLOW_STATUS_FILE" 2>/dev/null || echo "未知")"
         echo ""
 
         echo -e "${CYAN}阶段状态:${NC}"
-        jq -r '.phases | to_entries[] | "  \(.key): \(.value.status) (\(.value.start_time // "未开始") - \(.value.end_time // "进行中"))"' "$WORKFLOW_STATUS_FILE"
+        echo "  深度讨论: $(jq -r '.phases.deep_discussion.status' "$WORKFLOW_STATUS_FILE" 2>/dev/null || echo "未知")"
+        echo "  执行计划: $(jq -r '.phases.execution_planning.status' "$WORKFLOW_STATUS_FILE" 2>/dev/null || echo "未知")"
+        echo "  自动执行: $(jq -r '.phases.auto_execution.status' "$WORKFLOW_STATUS_FILE" 2>/dev/null || echo "未知")"
+        echo "  自我验证: $(jq -r '.phases.self_validation.status' "$WORKFLOW_STATUS_FILE" 2>/dev/null || echo "未知")"
         echo ""
 
         echo -e "${CYAN}安全状态:${NC}"
-        local safety_enabled=$(jq -r '.safety.boundary_enabled' "$WORKFLOW_STATUS_FILE")
-        local security_events=$(jq -r '.safety.security_events_count' "$WORKFLOW_STATUS_FILE")
+        local safety_enabled=$(jq -r '.safety.boundary_enabled' "$WORKFLOW_STATUS_FILE" 2>/dev/null || echo "false")
+        local security_events=$(jq -r '.safety.security_events_count' "$WORKFLOW_STATUS_FILE" 2>/dev/null || echo "0")
         echo -e "  安全边界: $([ "$safety_enabled" = true ] && echo "${GREEN}启用${NC}" || echo "${RED}禁用${NC}")"
         echo -e "  安全事件: $security_events 次"
         echo ""
 
         echo -e "${CYAN}执行状态:${NC}"
-        local progress=$(jq -r '.execution.progress_percentage' "$WORKFLOW_STATUS_FILE")
-        local auto_confirm=$(jq -r '.execution.auto_confirm_enabled' "$WORKFLOW_STATUS_FILE")
+        local progress=$(jq -r '.execution.progress_percentage' "$WORKFLOW_STATUS_FILE" 2>/dev/null || echo "0")
+        local auto_confirm=$(jq -r '.execution.auto_confirm_enabled' "$WORKFLOW_STATUS_FILE" 2>/dev/null || echo "false")
         echo -e "  执行进度: ${progress}%"
         echo -e "  自动确认: $([ "$auto_confirm" = true ] && echo "${GREEN}启用${NC}" || echo "${RED}禁用${NC}")"
 
@@ -433,25 +479,35 @@ show_autopilot_status() {
         if [[ -f "$TODO_TRACKER_FILE" ]]; then
             echo ""
             echo -e "${CYAN}TODO进度详情:${NC}"
-            local completed=$(jq -r '.completed_todos' "$TODO_TRACKER_FILE")
-            local total=$(jq -r '.total_todos' "$TODO_TRACKER_FILE")
-            local current=$(jq -r '.current_todo' "$TODO_TRACKER_FILE")
+            local completed=$(jq -r '.completed_todos' "$TODO_TRACKER_FILE" 2>/dev/null || echo "0")
+            local total=$(jq -r '.total_todos' "$TODO_TRACKER_FILE" 2>/dev/null || echo "0")
+            local current=$(jq -r '.current_todo' "$TODO_TRACKER_FILE" 2>/dev/null || echo "null")
             echo -e "  已完成: $completed/$total"
             echo -e "  当前任务: $([ "$current" != "null" ] && echo "$current" || echo "无")"
         fi
+
+        # 文件状态
+        echo ""
+        echo -e "${CYAN}文件状态:${NC}"
+        echo -e "  需求对齐: $([ -f "$REQUIREMENT_ALIGNMENT_FILE" ] && echo "${GREEN}存在${NC}" || echo "${RED}缺失${NC}")"
+        echo -e "  执行计划: $([ -f "$EXECUTION_PLAN_FILE" ] && echo "${GREEN}存在${NC}" || echo "${RED}缺失${NC}")"
+        echo -e "  TODO跟踪: $([ -f "$TODO_TRACKER_FILE" ] && echo "${GREEN}存在${NC}" || echo "${RED}缺失${NC}")"
+        echo -e "  执行日志: $([ -f "$EXECUTION_LOG_FILE" ] && echo "${GREEN}存在${NC}" || echo "${RED}缺失${NC}")"
+
     else
         echo -e "${RED}工作流状态文件不存在${NC}"
+        echo -e "${YELLOW}请先执行: $0 --start${NC}"
     fi
 }
 
 # 显示帮助信息
 show_help() {
     cat << EOF
-Claude Code AutoPilot System 启动器 v2.0
+${WHITE}Claude Code AutoPilot System 启动器 v2.0${NC}
 
-用法: $0 [选项]
+${CYAN}用法:${NC} $0 [选项]
 
-选项:
+${YELLOW}选项:${NC}
     --start                    启动AutoPilot工作流（深度讨论模式）
     --complete-discussion     完成深度讨论阶段
     --complete-planning       完成执行计划生成阶段
@@ -459,7 +515,7 @@ Claude Code AutoPilot System 启动器 v2.0
     --status                   显示工作流状态
     --help                     显示此帮助信息
 
-AutoPilot工作流流程:
+${CYAN}AutoPilot工作流流程:${NC}
     1. $0 --start                # 启动深度需求讨论
     2. 执行深度讨论命令
     3. $0 --complete-discussion # 标记讨论完成
@@ -467,11 +523,18 @@ AutoPilot工作流流程:
     5. $0 --complete-planning   # 标记计划完成
     6. $0 --start-autonomous    # 开始无人值守执行
 
-安全特性:
+${GREEN}安全特性:${NC}
     - 项目目录内安全边界
     - 危险操作自动阻止
     - 24小时无人值守执行
     - 完全的执行透明度
+
+${BLUE}文件说明:${NC}
+    - template-docs/REQUIREMENT_ALIGNMENT.md  # 需求对齐模板
+    - template-docs/EXECUTION_PLAN.md         # 执行计划模板
+    - ENHANCED_WORKFLOW_STATUS.json           # 工作流状态
+    - EXECUTION_PLAN.json                     # 详细执行计划
+    - TODO_TRACKER.json                       # TODO进度跟踪
 
 EOF
 }
@@ -484,6 +547,7 @@ main() {
     # 检查依赖
     if ! check_dependencies; then
         log_autopilot_workflow "ERROR" "依赖检查失败，请安装必要的工具"
+        echo -e "${RED}❌ 依赖检查失败，请参考README.md安装必需工具${NC}"
         exit 1
     fi
 
@@ -518,6 +582,7 @@ main() {
             ;;
         *)
             log_autopilot_workflow "ERROR" "未知选项: $1"
+            echo -e "${RED}❌ 未知选项: $1${NC}"
             show_help
             exit 1
             ;;
