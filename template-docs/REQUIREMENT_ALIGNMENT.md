@@ -1,6 +1,6 @@
 # 需求对齐模板
 
-> **使用说明**: Claude Code AutoPilot System自动引导的需求对齐对话模板，确保完全理解用户真实需求，为AutoPilot执行提供准确的导航依据。
+> **使用说明**: Claude Code AutoPilot自动引导的需求对齐对话模板，确保完全理解用户真实需求，为AutoPilot执行提供准确的导航依据。
 
 ## 🎯 需求对齐目标
 

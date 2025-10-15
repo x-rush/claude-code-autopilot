@@ -1,4 +1,4 @@
-# Claude Code AutoPilot System (v2.0)
+# Claude Code AutoPilot (v2.0)
 
 > **Claude Code CLI 的自动驾驶系统** - 基于深度需求讨论、详细TODO规划和安全边界控制的完全自动化执行系统
 

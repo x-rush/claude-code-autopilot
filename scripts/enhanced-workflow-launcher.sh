@@ -1,5 +1,5 @@
 #!/bin/bash
-# Claude Code AutoPilot System 启动器
+# Claude Code AutoPilot 启动器
 # Claude Code CLI的自动驾驶系统 - 支持深度讨论 + 详细TODO + 真正无人值守的工作流
 
 # 获取脚本目录
@@ -128,7 +128,7 @@ EOF
 
     # 创建执行日志
     {
-        echo "# Claude Code AutoPilot System 执行日志"
+        echo "# Claude Code AutoPilot 执行日志"
         echo "会话ID: AUTOPILOT_$(generate_id)"
         echo "开始时间: $(get_iso_timestamp)"
         echo "系统版本: autopilot_v2.0"
@@ -445,7 +445,7 @@ update_execution_progress() {
 # =============================================================================
 
 show_autopilot_status() {
-    echo -e "${WHITE}=== Claude Code AutoPilot System 状态 ===${NC}"
+    echo -e "${WHITE}=== Claude Code AutoPilot 状态 ===${NC}"
     echo ""
 
     if [[ -f "$WORKFLOW_STATUS_FILE" ]]; then
@@ -503,7 +503,7 @@ show_autopilot_status() {
 # 显示帮助信息
 show_help() {
     cat << EOF
-${WHITE}Claude Code AutoPilot System 启动器 v2.0${NC}
+${WHITE}Claude Code AutoPilot 启动器 v2.0${NC}
 
 ${CYAN}用法:${NC} $0 [选项]
 

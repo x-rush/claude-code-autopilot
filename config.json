@@ -1,7 +1,7 @@
 {
   "version": "2.0",
   "project": {
-    "name": "Claude Code AutoPilot System",
+    "name": "Claude Code AutoPilot",
     "description": "Claude Code CLI的自动驾驶系统 - 基于深度需求讨论的完全自动化执行系统",
     "created": "2025-10-14",
     "updated": "2025-10-15",

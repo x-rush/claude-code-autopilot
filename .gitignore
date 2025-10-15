@@ -11,7 +11,7 @@ Thumbs.db
 *.swo
 *~
 
-# Claude Code AutoPilot System 运行时产生的文件
+# Claude Code AutoPilot 运行时产生的文件
 ENHANCED_WORKFLOW_STATUS.json
 REQUIREMENT_ALIGNMENT.json
 EXECUTION_PLAN.json
