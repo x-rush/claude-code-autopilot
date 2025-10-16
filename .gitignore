@@ -11,34 +11,36 @@ Thumbs.db
 *.swo
 *~
 
-# Claude Code AutoPilot 运行时产生的文件
-ENHANCED_WORKFLOW_STATUS.json
+# Claude Code AutoPilot Plugin 运行时产生的文件
+# 插件执行状态文件
 REQUIREMENT_ALIGNMENT.json
 EXECUTION_PLAN.json
 TODO_TRACKER.json
-EXECUTION_LOG.md
-SECURITY_LOG.md
-SAFETY_MONITOR_LOG.md
-MONITOR_DASHBOARD.md
-HEALTH_CHECK_LOG.md
-BACKUPS/
-RECOVERY_POINTS/
-STATE_BACKUPS/
-ERROR_REPORTS/
-QUALITY_REPORTS/
-logs/
-RETRY_LOG.md
-ALERT_HISTORY.md
-MONITOR_LOG.md
+DECISION_LOG.json
+EXECUTION_STATE.json
 
-# 临时命令文件
-START_DISCUSSION_COMMAND.txt
-GENERATE_PLAN_COMMAND.txt
-START_EXECUTION_COMMAND.txt
+# 插件运行日志和报告
+*_execution_log.md
+*_decision_log.md
+*_progress_report.md
+*_quality_report.md
+*_recovery_log.md
 
-# 临时配置文件
-autonomous_config.json
-temp_status.json
+# 插件运行时目录
+autopilot-session-*/
+autopilot-backups/
+autopilot-recovery-points/
+autopilot-logs/
+
+# 临时命令和配置文件
+claude-autopilot-*.txt
+claude-autopilot-*.json
+claude-session-*.json
+
+# Claude Code 运行时文件
+.claude-session/
+.claude-context/
+.claude-cache/
 
 # 其他运行时文件
 *.pid
@@ -47,27 +49,15 @@ temp_status.json
 .vscode/
 .idea/
 *.sublime-*
- Atom/
-.vscode/
-
-# Node.js (如果有)
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Python (如果有)
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
+Atom/
 
 # 备份文件
 *.backup
 *.old
+*_backup_*
+
+# 测试和构建产物
+test-results/
+coverage/
+*.test.log
+plugin-test-report-*.md

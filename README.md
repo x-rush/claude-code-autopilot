@@ -1,349 +1,352 @@
-# Claude Code AutoPilot (v2.0)
+# Claude Code AutoPilot Plugin
 
-> **Claude Code CLI 的自动驾驶系统** - 基于深度需求讨论、详细TODO规划和安全边界控制的完全自动化执行系统
+> **完全无人值守的项目执行系统** - 基于深度需求讨论、智能执行计划、严格质量控制和连续自主执行
 
-## 🎯 核心设计理念
+## 🎯 核心特性
 
-### **你的工作流程，完美实现**
-```
-深度需求讨论 (15分钟) → 详细TODO规划 → 24小时无人值守执行
-```
+### 🤖 深度需求讨论
+- **结构化对话流程**：确保完全理解用户真实需求和期望
+- **决策点智能识别**：自动识别所有可能的决策点
+- **预设解决方案**：为每个决策点预设最佳解决方案
+- **需求对齐验证**：确保执行结果与原始需求完全一致
 
-1. **第一阶段：深度需求讨论** - 确保Claude Code完全理解你的需求和所有决策点
-2. **第二阶段：详细TODO规划** - 生成包含所有预设决策的执行计划
-3. **第三阶段：真正无人值守** - Claude Code严格按照计划执行，无需人工干预
+### 🚀 连续自主执行
+- **24小时连续工作**：真正的无分段连续执行
+- **智能上下文管理**：自动处理对话长度限制
+- **断点续传机制**：异常中断后自动恢复执行
+- **自动重试策略**：分类处理各种异常情况
 
-### **安全边界控制**
-- ✅ **项目目录内完全权限** - Claude Code可以自由编辑项目内任何文件
-- ❌ **项目目录外禁止访问** - 绝对不能触碰系统其他部分
-- 🔒 **危险操作自动阻止** - rm -rf、pkill等危险命令被禁止
+### 🛡️ 安全质量保障
+- **项目目录限制**：仅在当前项目目录内执行操作
+- **危险操作阻止**：自动识别并阻止危险系统命令
+- **质量门禁控制**：严格执行质量标准和验证机制
+- **完整操作审计**：记录所有操作，支持回滚和恢复
 
-## 🔧 系统要求
+## 📋 系统要求
 
-### **必要工具依赖**
-在运行系统之前，请确保已安装以下必要工具：
-
-#### **核心必需工具**
+### 必要工具
 ```bash
+# Claude Code CLI (必需)
+# 参考官方文档安装: https://docs.claude.com/claude-code
+
 # JSON处理工具
 sudo apt-get install jq                    # Ubuntu/Debian
 brew install jq                           # macOS
 
-# Claude Code CLI
-# 参考官方文档安装: https://docs.claude.com/claude-code
-
-# 路径处理工具
-sudo apt-get install realpath             # Ubuntu/Debian
-brew install coreutils                    # macOS (包含realpath)
+# 基础工具 (大多数系统已预装)
+# awk, curl, date, stat, realpath
 ```
 
-#### **其他必需工具**
+### 环境检查
 ```bash
-# 文本处理工具（所有Linux/Unix系统自带，通常无需额外安装）
-# awk - 用于磁盘使用率计算等文本处理任务
-
-# 网络工具（现代系统通常自带）
-# curl - 网络请求和API检查
-# ping - 网络连接测试
-```
-
-### **依赖检查**
-```bash
-# 检查所有必需工具是否安装
-for tool in jq realpath awk curl ping date stat claude; do
+# 检查依赖工具
+for tool in jq awk curl date stat realpath; do
     if which "$tool" &>/dev/null; then
         echo "✅ $tool 已安装"
     else
         echo "❌ 请先安装 $tool"
     fi
 done
-
-# 系统会在启动时自动检查依赖，缺失工具会给出明确提示
 ```
 
-**说明：**
-- 大多数Linux发行版已预装除 `jq` 和 `claude` 外的所有工具
-- macOS用户可能需要安装 `coreutils` 来获得 `realpath` 等工具
-- 所有列出的工具都是系统运行所必需的，缺少任何一个都会导致启动失败
+## 🚀 快速开始
 
-## 🚀 快速开始 (5分钟)
+### 1. 安装插件
 
-### **第一步：启动AutoPilot工作流**
+#### 方法1：本地开发安装 (推荐)
 ```bash
-# 在你的项目根目录下
-./scripts/enhanced-workflow-launcher.sh --start
-```
+# 1. 克隆插件仓库
+git clone https://github.com/x-rush/claude-code-autopilot.git
+cd claude-code-autopilot
 
-### **第二步：深度需求讨论 (15-20分钟)**
-脚本会显示完整的深度讨论命令，你可以直接复制到新终端执行：
+# 2. 创建本地marketplace
+mkdir ../autopilot-marketplace
+cd ../autopilot-marketplace
 
-```
-🎯 深度需求讨论流程
-
-这个讨论将分为四个阶段，确保我们完全明确所有细节：
-
-### 第一阶段：核心目标理解 (3-5分钟)
-- 最终想要的具体成果
-- 成果的使用场景和用户
-- 完成的质量标准
-
-### 第二阶段：执行细节挖掘 (5-8分钟)
-- 技术实现偏好
-- 风险容忍度
-- 特殊要求和约束
-
-### 第三阶段：决策点识别 (3-5分钟)
-- 可能遇到的决策点
-- 每个决策点的处理偏好
-- 备选方案优先级
-
-### 第四阶段：执行计划生成 (自动)
-- 基于讨论生成详细TODO清单
-- 预设所有决策点的解决方案
-- 设定安全边界和质量标准
-
-你准备好开始深度需求讨论了吗？
-```
-
-💡 **提示**：
-- 参考 `template-docs/REQUIREMENT_ALIGNMENT.md` 进行结构化讨论
-- 讨论完成后生成 `REQUIREMENT_ALIGNMENT.json` 文件
-
-### **第三步：完成讨论并标记**
-```bash
-# 深度讨论完成后执行
-./scripts/enhanced-workflow-launcher.sh --complete-discussion
-```
-
-### **第四步：生成执行计划**
-脚本会显示执行计划生成命令，复制到新终端执行：
-
-```
-请按照以下结构生成执行计划：
-
-## 📋 执行计划生成要求
-
-### 1. 识别所有决策点
-回顾我们的讨论，识别出执行中可能遇到的任何决策点，并为每个决策点预设解决方案。
-
-### 2. 生成详细TODO清单
-将整个项目分解为具体的、可执行的TODO项目，每个TODO包括：
-- 清晰的任务描述
-- 具体的验收标准
-- 预估执行时间
-- 依赖关系
-- 自我检查点
-
-### 3. 设定安全边界
-- 确认只在项目目录内操作
-- 设定文件操作限制
-- 定义危险操作禁止规则
-
-### 4. 质量控制标准
-- 每个TODO的质量检查方法
-- 整体质量验证标准
-- 自我检查频率
-```
-
-💡 **提示**：
-- 参考 `template-docs/EXECUTION_PLAN.md` 了解详细结构要求
-- 生成完整的 `EXECUTION_PLAN.json` 文件
-
-### **第五步：完成规划**
-```bash
-# 执行计划生成完成后执行
-./scripts/enhanced-workflow-launcher.sh --complete-planning
-```
-
-### **第六步：开始真正无人值守执行**
-脚本会显示启动命令，复制到新终端执行：
-
-```
-## 🚀 无人值守执行启动
-
-### 执行基础
-- 执行计划ID: [从EXECUTION_PLAN.json读取]
-- TODO总数: [从EXECUTION_PLAN.json读取]
-- 安全边界: 已启用（仅限项目目录）
-- 自动确认: 已启用
-- 自我检查: 已启用
-
-### 执行承诺
-我将严格按照以下原则执行：
-1. **完全按照TODO清单执行** - 不偏离预设计划
-2. **所有决策基于预设方案** - 不需要人工干预
-3. **持续自我检查和验证** - 确保质量符合标准
-4. **严格遵守安全边界** - 只在项目目录内操作
-5. **实时记录执行进度** - 完全透明的进度追踪
-
-我现在开始24小时无人值守执行，严格按照执行计划进行，确保最终结果完全符合我们的深度讨论和执行计划要求。
-```
-
-🔥 **重要提示**：
-- 此阶段将开始完全无人值守执行
-- Claude将严格按照 `EXECUTION_PLAN.json` 执行
-- 可以通过 `--status` 实时查看进度
-- 所有操作都在安全边界内进行
-
-```bash
-# 启动24小时无人值守执行
-./scripts/enhanced-workflow-launcher.sh --start-autonomous
-```
-
-## 📁 文件结构
-
-```
-claude-code-workflow-template/
-├── README.md                       # 本文件 - 系统说明
-├── config.json                     # 系统配置文件
-├── scripts/                        # 核心脚本目录
-│   ├── enhanced-workflow-launcher.sh  # 🆕 主启动器 (v2.0)
-│   ├── safety-boundary.sh              # 🆕 安全边界控制器
-│   ├── common-config.sh                # 通用配置函数
-│   └── deviation-detector.sh           # 偏差检测器 (保留)
-└── template-docs/                  # 模板文档目录
-    ├── REQUIREMENT_ALIGNMENT.md       # 需求对齐模板
-    └── EXECUTION_PLAN.md              # 🆕 执行计划模板
-```
-
-## 🛡️ 安全机制详解
-
-### **1. 项目目录隔离**
-```bash
-# ✅ 允许的操作
-./src/
-./docs/
-./scripts/
-./config/
-./data/
-
-# ❌ 禁止的操作
-../
-/etc/
-/home/
-/usr/
-/var/
-```
-
-### **2. 危险操作黑名单**
-```bash
-# 🚨 绝对禁止的危险操作
-rm -rf /
-pkill -9 node
-shutdown now
-systemctl restart
-chmod 777 /
-chown root
-sudo su
-```
-
-### **3. 安全事件监控**
-- 所有操作都会记录到 `SECURITY_LOG.md`
-- 危险尝试会触发安全告警
-- 违规操作会自动阻止并记录
-
-## 📋 执行示例
-
-### **深度讨论对话示例**
-```
-Claude: 为了确保完美执行你的项目，我需要深度理解你的需求。
-
-## 🎯 第一阶段：核心目标确认
-
-你最终想要得到什么具体成果？
-用户: 我想要一个完整的微服务API文档系统，包含自动生成的API文档、用户手册和部署指南。
-
-这个成果将如何被使用？谁会使用它？
-用户: 开发团队会使用API文档进行接口对接，运维团队使用部署指南，产品团队使用用户手册。
-
-怎样算"任务完成得很好"？
-用户: 文档结构清晰，自动生成的API文档准确无误，部署指南可以直接用于生产环境。
-```
-
-### **生成的执行计划示例**
-```json
+# 3. 创建marketplace配置
+cat > marketplace.json << 'EOF'
 {
-  "execution_plan": {
-    "session_id": "EXEC_20251015_143022",
-    "execution_todos": [
-      {
-        "todo_id": "TODO_001",
-        "title": "分析现有API结构",
-        "description": "扫描项目中的API定义，提取接口信息",
-        "acceptance_criteria": [
-          "所有API端点都已识别",
-          "请求/响应参数都已提取",
-          "API分类和分组完成"
-        ],
-        "estimated_time": 30,
-        "self_check_points": [
-          {
-            "checkpoint_name": "API完整性检查",
-            "check_items": ["端点数量", "参数完整性", "分类正确性"]
-          }
-        ]
-      }
-    ],
-    "pre_decisions": [
-      {
-        "decision_point": "API文档格式选择",
-        "preset_solution": "使用OpenAPI 3.0规范",
-        "trigger_conditions": ["发现多种API定义格式"],
-        "decision_criteria": ["标准化程度", "工具支持", "可维护性"]
-      }
-    ]
-  }
-}
-```
-
-## 📈 监控和状态跟踪
-
-### **查看工作流状态**
-```bash
-# 查看完整状态
-./scripts/enhanced-workflow-launcher.sh --status
-```
-
-### **查看安全状态**
-```bash
-# 查看安全边界状态
-./scripts/safety-boundary.sh --status
-```
-
-### **状态文件说明**
-- `ENHANCED_WORKFLOW_STATUS.json` - 工作流总体状态
-- `EXECUTION_PLAN.json` - 详细执行计划
-- `TODO_TRACKER.json` - TODO执行进度
-- `SECURITY_LOG.md` - 安全事件日志
-
-## 🔧 配置说明
-
-### **系统配置 (config.json)**
-```json
-{
-  "version": "2.0",
-  "execution": {
-    "max_execution_hours": 24,
-    "auto_confirm": true,
-    "safety_boundary": true,
-    "self_check_enabled": true
+  "name": "autopilot-marketplace",
+  "owner": {
+    "name": "AutoPilot Team"
   },
-  "safety": {
-    "allowed_root": "项目根目录",
-    "dangerous_patterns_blocked": true
-  }
+  "plugins": [
+    {
+      "name": "claude-code-autopilot",
+      "source": "../claude-code-autopilot",
+      "description": "Claude Code AutoPilot - 无人值守项目执行系统"
+    }
+  ]
 }
+EOF
+
+# 4. 启动Claude Code并安装
+claude
+/plugin marketplace add ./autopilot-marketplace
+/plugin install claude-code-autopilot@autopilot-marketplace
 ```
 
-### **安全边界自定义**
-编辑 `scripts/safety-boundary.sh` 中的配置：
+#### 方法2：团队共享安装
 ```bash
-# 允许的文件类型
-readonly ALLOWED_EXTENSIONS=("md" "txt" "json" "js" "py" "sh")
+# 在你的项目根目录添加配置
+echo '{
+  "plugins": [
+    {
+      "name": "claude-code-autopilot",
+      "source": "https://github.com/x-rush/claude-code-autopilot.git",
+      "enabled": true
+    }
+  ]
+}' > .claude/settings.json
 
-# 允许的目录
-readonly ALLOWED_DIRECTORIES=("src" "docs" "scripts" "config")
+# 团队成员使用
+cd your-project
+claude
+/trust-folder  # 自动安装配置的插件
 ```
+
+### 2. 启动AutoPilot
+
+#### 启动Claude Code (使用权限跳过模式)
+```bash
+claude --dangerously-skip-permissions
+```
+
+#### 启动AutoPilot工作流
+```
+/autopilot-continuous-start
+```
+
+### 3. 深度需求讨论 (30分钟)
+Claude将引导你进行结构化的需求讨论：
+
+1. **核心目标确认**
+   - 最终想要的具体成果
+   - 成果的使用场景和用户群体
+   - 成功的质量标准和验收条件
+
+2. **执行细节挖掘**
+   - 技术实现偏好和风格
+   - 风险容忍度和特殊要求
+   - 质量标准和完整性要求
+
+3. **决策点识别**
+   - 识别所有可能的决策点
+   - 为每个决策点预设解决方案
+   - 建立决策优先级和备选方案
+
+4. **需求对齐验证**
+   - 生成结构化需求文件
+   - 验证需求的一致性和完整性
+
+### 4. 连续自主执行 (24小时)
+讨论完成后，Claude将立即开始连续执行：
+
+- **严格按照TODO清单执行**：不偏离计划，使用预设决策方案
+- **智能上下文管理**：避免对话长度限制，保持执行连续性
+- **自动异常处理**：分类重试机制，智能处理各种异常
+- **持续需求对齐**：定期验证执行结果与原始需求的一致性
+
+## 📊 监控和管理
+
+### 查看执行状态
+```
+/autopilot-status
+```
+
+显示内容包括：
+- 实时进度信息
+- 质量指标和评分
+- 错误统计和恢复情况
+- 时间分析和预估
+- 故障诊断和建议
+
+### 智能上下文刷新
+```
+/autopilot-context-refresh
+```
+
+当需要时手动触发上下文刷新：
+- 提取关键历史信息
+- 重建执行状态
+- 确保执行连续性
+
+### 异常恢复
+```
+/autopilot-recovery
+```
+
+当Claude Code异常中断时：
+- 自动检测中断原因
+- 恢复执行状态
+- 从断点继续执行
+
+## 📁 项目结构
+
+```
+claude-code-autopilot/
+├── .claude-plugin/
+│   └── plugin.json              # 插件清单文件
+├── commands/                    # Slash命令目录
+│   ├── autopilot-continuous-start.md    # 启动连续执行
+│   ├── autopilot-status.md             # 查看执行状态
+│   ├── autopilot-context-refresh.md     # 上下文刷新
+│   └── autopilot-recovery.md           # 异常恢复
+├── templates/                   # 状态文件模板
+│   ├── REQUIREMENT_ALIGNMENT.json       # 需求对齐模板
+│   ├── EXECUTION_PLAN.json              # 执行计划模板
+│   ├── TODO_TRACKER.json                # TODO跟踪模板
+│   ├── DECISION_LOG.json                # 决策日志模板
+│   └── EXECUTION_STATE.json            # 执行状态模板
+├── agents/                      # 专用代理配置 (未来扩展)
+├── scripts/                     # 辅助脚本 (来自原项目)
+│   ├── safety-boundary.sh             # 安全边界控制
+│   ├── common-config.sh               # 通用配置
+│   └── deviation-detector.sh          # 偏差检测
+└── README.md                    # 本文档
+```
+
+## 🔄 工作流程详解
+
+### 阶段1：深度需求讨论 (30分钟)
+```
+用户输入任务 → Claude结构化提问 → 深度需求挖掘 → 决策点识别 → 需求对齐验证
+```
+
+### 阶段2：执行计划生成 (15分钟)
+```
+需求分析 → TODO分解 → 质量门禁设定 → 异常处理配置 → 执行计划确认
+```
+
+### 阶段3：连续自主执行 (24小时)
+```
+按TODO执行 → 质量验证 → 进度更新 → 上下文管理 → 异常处理 → 需求对齐检查
+```
+
+### 阶段4：智能监控恢复 (持续)
+```
+状态监控 → 异常检测 → 自动恢复 → 断点续传 → 执行继续
+```
+
+## 📊 状态文件说明
+
+### REQUIREMENT_ALIGNMENT.json
+记录需求对齐的完整结果：
+- 用户的核心目标和期望
+- 详细的交付物要求
+- 预设的决策解决方案
+- 质量标准和约束条件
+
+### EXECUTION_PLAN.json
+详细的执行计划：
+- 完整的TODO清单
+- 任务依赖关系和顺序
+- 质量门禁和检查点
+- 安全边界和操作限制
+
+### TODO_TRACKER.json
+实时进度跟踪：
+- 每个任务的执行状态
+- 质量评分和验收结果
+- 错误历史和重试记录
+- 需求对齐验证结果
+
+### DECISION_LOG.json
+决策过程记录：
+- 所做决策的详细信息
+- 决策依据和考虑因素
+- 与需求的对齐情况
+- 决策效果评估
+
+### EXECUTION_STATE.json
+详细的执行状态：
+- 当前执行位置和上下文
+- 系统健康和资源状况
+- 错误恢复和异常处理
+- 下一阶段行动建议
+
+## ⚠️ 安全和限制
+
+### 安全保障
+- ✅ **项目目录限制**：仅在当前项目目录内执行操作
+- ✅ **危险操作阻止**：自动识别并阻止危险系统命令
+- ✅ **完整操作日志**：记录所有操作，支持审计和回滚
+- ✅ **权限控制**：严格的操作权限管理
+
+### 操作限制
+- **允许的操作**：文件读写、编辑、创建、目录操作
+- **禁止的操作**：系统级命令、用户管理、权限提升
+- **文件大小限制**：单个文件不超过100MB
+- **执行时间限制**：最长24小时连续执行
+
+### 数据安全
+- **状态文件备份**：重要状态的多重备份机制
+- **数据完整性校验**：状态文件的一致性验证
+- **恢复机制**：异常中断后的数据恢复保证
+
+## 🛠️ 故障排除
+
+### 常见问题
+
+#### 1. 插件安装失败
+```bash
+# 检查Claude Code版本
+claude --version
+
+# 重新安装插件
+/plugin remove claude-code-autopilot@autopilot-marketplace
+/plugin install claude-code-autopilot@autopilot-marketplace
+```
+
+#### 2. 权限问题
+```bash
+# 确保使用权限跳过模式启动
+claude --dangerously-skip-permissions
+
+# 检查文件权限
+ls -la .claude/
+```
+
+#### 3. 状态文件损坏
+```bash
+# 使用恢复命令
+/autopilot-recovery
+
+# 检查状态文件完整性
+jq . REQUIREMENT_ALIGNMENT.json
+```
+
+#### 4. 执行中断
+```bash
+# 检查Claude进程状态
+ps aux | grep claude
+
+# 重启Claude并恢复
+claude --dangerously-skip-permissions
+/autopilot-recovery
+```
+
+### 调试模式
+```bash
+# 启动调试模式
+claude --debug --dangerously-skip-permissions
+
+# 查看详细日志
+tail -f AUTOPILOT_LOG.md
+```
+
+## 📈 性能优化
+
+### 建议配置
+- **内存**：至少2GB可用内存
+- **磁盘**：至少1GB可用空间
+- **网络**：稳定的网络连接
+
+### 优化建议
+- 定期清理临时文件
+- 监控磁盘使用情况
+- 保持系统稳定运行
+- 避免频繁重启
 
 ## 🎯 适用场景
 
@@ -361,42 +364,59 @@ readonly ALLOWED_DIRECTORIES=("src" "docs" "scripts" "config")
 - 需要与外部系统深度集成
 - 实时性要求极高的任务
 
-## 🚨 重要安全提醒
+## 🤝 贡献和支持
 
-1. **仅在项目目录内使用** - 确保只在你的项目目录中运行此系统
-2. **检查安全日志** - 定期查看 `SECURITY_LOG.md` 了解安全事件
-3. **备份数据** - 在运行前备份重要数据
-4. **监控执行过程** - 虽然是无人值守，但建议定期检查进度
+### 报告问题
+如果遇到问题，请提供：
+1. 错误信息和日志
+2. 系统环境信息
+3. 重现步骤
+4. 预期行为
 
-## 🆕 v2.0 新特性
+### 贡献代码
+欢迎提交Pull Request来改进插件：
+1. Fork项目仓库
+2. 创建功能分支
+3. 提交代码变更
+4. 创建Pull Request
 
-### **对比原版本**
-| 特性 | v1.0 (旧版本) | v2.0 (当前版本) |
-|------|---------------|-----------------|
-| 人工干预 | 需要多次 | 只需一次深度讨论 |
-| 决策分歧 | 执行中可能出现 | 所有决策点前置讨论 |
-| 权限控制 | 无明确控制 | 项目目录内完全权限 |
-| 无人值守 | ❌ 半自动化 | ✅ 真正无人值守 |
-| 安全保障 | 基础 | 多层安全边界 |
+### 技术支持
+- 查看文档：`/help`
+- 状态检查：`/autopilot-status`
+- 社区讨论：GitHub Issues
 
-### **新增核心组件**
-- `scripts/enhanced-workflow-launcher.sh` - AutoPilot系统启动器
-- `scripts/safety-boundary.sh` - 安全边界控制器
-- `template-docs/EXECUTION_PLAN.md` - 执行计划生成模板
+## 📄 许可证
 
-## 🎉 总结
+MIT License - 详见 [LICENSE](LICENSE) 文件
 
-这个AutoPilot版本完美实现了你的需求：
-- **深度讨论前置** - 所有决策点在执行前充分讨论
-- **详细TODO规划** - 执行计划清晰明确
-- **项目目录安全** - 在项目内完全权限，项目外绝对禁止
-- **真正无人值守** - 24小时自动执行，无需人工干预
+## 🔄 版本历史
 
-**开始你的Claude Code AutoPilot项目：**
-```bash
-./scripts/enhanced-workflow-launcher.sh --start
-```
+### v1.0.0 (2025-10-15)
+- 🎉 初始版本发布
+- ✨ 深度需求讨论功能
+- ✨ 连续自主执行能力
+- ✨ 智能异常恢复机制
+- ✨ 完整的状态管理系统
+- 🛡️ 安全边界和质量控制
 
 ---
 
-**版本**: v2.0 | **更新时间**: 2025-10-15 | **状态**: 🟢 生产就绪
+**开始你的24小时无人值守项目：**
+
+```bash
+# 1. 安装插件
+git clone https://github.com/x-rush/claude-code-autopilot.git
+cd claude-code-autopilot
+
+# 2. 启动Claude Code
+claude --dangerously-skip-permissions
+
+# 3. 安装插件
+/plugin marketplace add ../autopilot-marketplace
+/plugin install claude-code-autopilot@autopilot-marketplace
+
+# 4. 开始AutoPilot
+/autopilot-continuous-start
+```
+
+让Claude Code AutoPilot为你实现真正的24小时无人值守项目执行！
