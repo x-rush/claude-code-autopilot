@@ -95,18 +95,22 @@ claude
 ```bash
 # 在你的项目根目录添加配置
 echo '{
-  "plugins": [
-    {
-      "name": "claude-code-autopilot",
-      "source": "https://github.com/x-rush/claude-code-autopilot.git",
-      "enabled": true
+  "enabledPlugins": {
+    "claude-code-autopilot@autopilot-marketplace": true
+  },
+  "extraKnownMarketplaces": {
+    "autopilot-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "x-rush/claude-code-autopilot"
+      }
     }
-  ]
+  }
 }' > .claude/settings.json
 
 # 团队成员使用
 cd your-project
-claude
+claude --dangerously-skip-permissions
 /trust-folder  # 自动安装配置的插件
 ```
 

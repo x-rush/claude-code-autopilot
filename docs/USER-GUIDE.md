@@ -113,13 +113,17 @@ claude --dangerously-skip-permissions
 ```bash
 # 在项目根目录创建配置
 echo '{
-  "plugins": [
-    {
-      "name": "claude-code-autopilot",
-      "source": "https://github.com/x-rush/claude-code-autopilot.git",
-      "enabled": true
+  "enabledPlugins": {
+    "claude-code-autopilot@autopilot-marketplace": true
+  },
+  "extraKnownMarketplaces": {
+    "autopilot-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "x-rush/claude-code-autopilot"
+      }
     }
-  ]
+  }
 }' > .claude/settings.json
 
 # 团队成员使用
