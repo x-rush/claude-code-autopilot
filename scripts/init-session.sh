@@ -1,37 +1,63 @@
 #!/bin/bash
-# Claude Code AutoPilot - 启动初始化脚本
-# 在开始执行前初始化所有必要的状态文件
 
-set -euo pipefail
+# Claude Code AutoPilot - 轻量级初始化脚本
+# 专注于MD规划文档+JSON状态记录的核心功能
+
+set -e
 
 # 颜色定义
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-YELLOW='\033[1;33m'
 RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
 NC='\033[0m'
+
+# 版本信息
+VERSION="1.0.0"
 
 # 日志函数
 log() {
-    echo -e "${GREEN}[$(date '+%Y-%m-%d %H:%M:%S')] AUTOPILOT-INIT: $1${NC}"
-}
-
-info() {
-    echo -e "${BLUE}[$(date '+%Y-%m-%d %H:%M:%S')] AUTOPILOT-INIT: $1${NC}"
+    echo -e "${GREEN}[INFO]${NC} $1"
 }
 
 warn() {
-    echo -e "${YELLOW}[$(date '+%Y-%m-%d %H:%M:%S')] AUTOPILOT-INIT: WARNING: $1${NC}"
+    echo -e "${YELLOW}[WARN]${NC} $1"
 }
 
 error() {
-    echo -e "${RED}[$(date '+%Y-%m-%d %H:%M:%S')] AUTOPILOT-INIT: ERROR: $1${NC}"
+    echo -e "${RED}[ERROR]${NC} $1"
+    exit 1
 }
 
-# 生成唯一ID
-generate_session_id() {
-    local prefix="$1"
-    echo "${prefix}_$(date +%Y%m%d_%H%M%S)_$$"
+# 显示帮助信息
+show_help() {
+    echo "Claude Code AutoPilot 轻量级初始化脚本 v$VERSION"
+    echo ""
+    echo "用法: $0 [选项]"
+    echo ""
+    echo "选项:"
+    echo "  -h, --help          显示此帮助信息"
+    echo "  -u, --uninstall     卸载AutoPilot状态文件"
+    echo "  -v, --version       显示版本信息"
+    echo "  -s, --status        显示初始化状态"
+    echo ""
+    echo "功能:"
+    echo "  - 初始化JSON状态文件（5个核心文件）"
+    echo "  - 支持Claude Code自动发现和加载"
+    echo "  - 轻量级设计，专注于MD+JSON记录"
+    echo ""
+    echo "状态文件:"
+    echo "  - REQUIREMENT_ALIGNMENT.json  需求对齐配置"
+    echo "  - EXECUTION_PLAN.json         执行计划配置"
+    echo "  - TODO_TRACKER.json          TODO进度跟踪"
+    echo "  - DECISION_LOG.json          决策日志记录"
+    echo "  - EXECUTION_STATE.json       执行状态管理"
+}
+
+# 显示版本信息
+show_version() {
+    echo "Claude Code AutoPilot 初始化脚本 v$VERSION"
+    echo "更新时间: 2025-10-17"
 }
 
 # 检查依赖
@@ -40,53 +66,36 @@ check_dependencies() {
 
     local missing_deps=()
 
+    # 检查基本工具
     for tool in jq date stat realpath; do
-        if ! which "$tool" &>/dev/null; then
+        if ! command -v "$tool" &> /dev/null; then
             missing_deps+=("$tool")
         fi
     done
 
     if [ ${#missing_deps[@]} -gt 0 ]; then
-        error "缺少依赖工具: ${missing_deps[*]}"
-        return 1
+        error "缺少以下依赖工具: ${missing_deps[*]}"
+        echo ""
+        echo "Ubuntu/Debian 安装命令:"
+        echo "  sudo apt-get install ${missing_deps[*]}"
+        echo ""
+        echo "macOS 安装命令:"
+        echo "  brew install ${missing_deps[*]}"
+        exit 1
     fi
 
-    log "依赖检查通过"
+    log "✅ 所有依赖检查通过"
 }
 
-# 验证环境
-validate_environment() {
-    log "验证执行环境..."
+# 生成唯一ID
+generate_session_id() {
+    local prefix="$1"
+    echo "${prefix}_$(date +%Y%m%d_%H%M%S)_$$"
+}
 
-    # 检查当前目录
-    if [ ! -f ".claude-plugin/plugin.json" ]; then
-        error "请在AutoPilot插件根目录下执行"
-        return 1
-    fi
-
-    # 检查templates目录
-    if [ ! -d "templates" ]; then
-        error "templates目录不存在"
-        return 1
-    fi
-
-    # 检查模板文件
-    local required_templates=(
-        "templates/REQUIREMENT_ALIGNMENT.json"
-        "templates/EXECUTION_PLAN.json"
-        "templates/TODO_TRACKER.json"
-        "templates/DECISION_LOG.json"
-        "templates/EXECUTION_STATE.json"
-    )
-
-    for template in "${required_templates[@]}"; do
-        if [ ! -f "$template" ]; then
-            error "缺少模板文件: $template"
-            return 1
-        fi
-    done
-
-    log "环境验证通过"
+# 获取时间戳
+get_timestamp() {
+    date -Iseconds
 }
 
 # 初始化需求对齐文件
@@ -94,7 +103,7 @@ init_requirement_alignment() {
     log "初始化需求对齐文件..."
 
     local session_id=$(generate_session_id "REQ")
-    local timestamp=$(date -Iseconds)
+    local timestamp=$(get_timestamp)
 
     # 从模板复制并初始化
     jq --arg session_id "$session_id" \
@@ -120,7 +129,7 @@ init_requirement_alignment() {
         .requirement_alignment.alignment_verification.user_approval = false' \
        templates/REQUIREMENT_ALIGNMENT.json > REQUIREMENT_ALIGNMENT.json
 
-    log "需求对齐文件已初始化: $session_id"
+    log "✅ 需求对齐文件已初始化: $session_id"
 }
 
 # 初始化执行计划文件
@@ -128,13 +137,14 @@ init_execution_plan() {
     log "初始化执行计划文件..."
 
     local session_id=$(generate_session_id "EXEC")
-    local timestamp=$(date -Iseconds)
+    local timestamp=$(get_timestamp)
     local req_id=$(jq -r '.requirement_alignment.session_id' REQUIREMENT_ALIGNMENT.json)
 
     # 从模板复制并初始化
     jq --arg session_id "$session_id" \
        --arg timestamp "$timestamp" \
        --arg req_id "$req_id" \
+       --arg working_dir "$(realpath .)" \
        '.execution_plan.session_id = $session_id |
         .execution_plan.based_on_requirement = $req_id |
         .execution_plan.generated_at = $timestamp |
@@ -143,7 +153,7 @@ init_execution_plan() {
         .execution_plan.execution_todos = [] |
         .execution_plan.execution_phases = [] |
         .execution_plan.execution_gates = [] |
-        .execution_plan.safety_boundaries.workspace_root = "'$(realpath .)'" |
+        .execution_plan.safety_boundaries.workspace_root = $working_dir |
         .execution_plan.safety_boundaries.allowed_directories = ["./", "./src", "./docs", "./tests", "./scripts"] |
         .execution_plan.context_management.key_information_retention = [] |
         .execution_plan.recovery_and_resilience.auto_recovery_enabled = true |
@@ -152,7 +162,7 @@ init_execution_plan() {
         .execution_plan.completion_criteria.requirement_alignment_valid = false' \
        templates/EXECUTION_PLAN.json > EXECUTION_PLAN.json
 
-    log "执行计划文件已初始化: $session_id"
+    log "✅ 执行计划文件已初始化: $session_id"
 }
 
 # 初始化TODO跟踪文件
@@ -160,7 +170,7 @@ init_todo_tracker() {
     log "初始化TODO跟踪文件..."
 
     local session_id=$(generate_session_id "TRACK")
-    local timestamp=$(date -Iseconds)
+    local timestamp=$(get_timestamp)
     local exec_id=$(jq -r '.execution_plan.session_id' EXECUTION_PLAN.json)
     local req_id=$(jq -r '.requirement_alignment.session_id' REQUIREMENT_ALIGNMENT.json)
 
@@ -190,7 +200,7 @@ init_todo_tracker() {
         .todo_tracker.checkpoint_data.available_checkpoints = []' \
        templates/TODO_TRACKER.json > TODO_TRACKER.json
 
-    log "TODO跟踪文件已初始化: $session_id"
+    log "✅ TODO跟踪文件已初始化: $session_id"
 }
 
 # 初始化决策日志文件
@@ -198,7 +208,7 @@ init_decision_log() {
     log "初始化决策日志文件..."
 
     local session_id=$(generate_session_id "DEC")
-    local timestamp=$(date -Iseconds)
+    local timestamp=$(get_timestamp)
     local exec_id=$(jq -r '.execution_plan.session_id' EXECUTION_PLAN.json)
     local req_id=$(jq -r '.requirement_alignment.session_id' REQUIREMENT_ALIGNMENT.json)
 
@@ -222,7 +232,7 @@ init_decision_log() {
         .decision_log.decision_audit_trail.audit_entries = []' \
        templates/DECISION_LOG.json > DECISION_LOG.json
 
-    log "决策日志文件已初始化: $session_id"
+    log "✅ 决策日志文件已初始化: $session_id"
 }
 
 # 初始化执行状态文件
@@ -230,7 +240,7 @@ init_execution_state() {
     log "初始化执行状态文件..."
 
     local session_id=$(generate_session_id "STATE")
-    local timestamp=$(date -Iseconds)
+    local timestamp=$(get_timestamp)
     local exec_id=$(jq -r '.execution_plan.session_id' EXECUTION_PLAN.json)
     local req_id=$(jq -r '.requirement_alignment.session_id' REQUIREMENT_ALIGNMENT.json)
 
@@ -247,7 +257,7 @@ init_execution_state() {
         .execution_state.last_state_update = $timestamp |
         .execution_state.session_metadata.claude_session_start_time = $timestamp |
         .execution_state.session_metadata.total_execution_duration_minutes = 0 |
-        .execution_state.session_metadata.session_type = "continuous" |
+        .execution_state.session_metadata.session_type = "interactive" |
         .execution_state.session_metadata.recovery_count = 0 |
         .execution_state.session_metadata.context_refresh_count = 0 |
         .execution_state.current_execution_position.execution_progress_percentage = 0 |
@@ -264,132 +274,40 @@ init_execution_state() {
         .execution_state.next_steps_and_projections.immediate_next_action.estimated_start_time = $timestamp' \
        templates/EXECUTION_STATE.json > EXECUTION_STATE.json
 
-    log "执行状态文件已初始化: $session_id"
+    log "✅ 执行状态文件已初始化: $session_id"
 }
 
-# 创建必要的目录
-create_directories() {
-    log "创建必要的目录..."
+# 初始化所有状态文件
+init_all_states() {
+    log "开始初始化AutoPilot状态文件..."
 
-    local dirs=(
-        "autopilot-logs"
-        "autopilot-backups"
-        "autopilot-recovery-points"
-        "autopilot-session-temp"
-    )
+    check_dependencies
+    init_requirement_alignment
+    init_execution_plan
+    init_todo_tracker
+    init_decision_log
+    init_execution_state
 
-    for dir in "${dirs[@]}"; do
-        if [ ! -d "$dir" ]; then
-            mkdir -p "$dir"
-            log "创建目录: $dir"
-        fi
-    done
-}
-
-# 生成初始化报告
-generate_init_report() {
-    log "生成初始化报告..."
-
-    local report_file="autopilot-logs/init-report-$(date +%Y%m%d_%H%M%S).md"
-    local timestamp=$(date)
-
-    cat > "$report_file" << EOF
-# Claude Code AutoPilot 初始化报告
-
-**初始化时间**: $timestamp
-**工作目录**: $(realpath .)
-
-## 初始化的会话ID
-
-- **需求对齐ID**: $(jq -r '.requirement_alignment.session_id' REQUIREMENT_ALIGNMENT.json)
-- **执行计划ID**: $(jq -r '.execution_plan.session_id' EXECUTION_PLAN.json)
-- **TODO跟踪ID**: $(jq -r '.todo_tracker.session_id' TODO_TRACKER.json)
-- **决策日志ID**: $(jq -r '.decision_log.session_id' DECISION_LOG.json)
-- **执行状态ID**: $(jq -r '.execution_state.session_id' EXECUTION_STATE.json)
-
-## 创建的文件
-
-- ✅ \`REQUIREMENT_ALIGNMENT.json\` - 需求对齐配置
-- ✅ \`EXECUTION_PLAN.json\` - 执行计划配置
-- ✅ \`TODO_TRACKER.json\` - TODO进度跟踪
-- ✅ \`DECISION_LOG.json\` - 决策日志记录
-- ✅ \`EXECUTION_STATE.json\` - 执行状态管理
-
-## 创建的目录
-
-- ✅ \`autopilot-logs/\` - 执行日志目录
-- ✅ \`autopilot-backups/\` - 备份目录
-- ✅ \`autopilot-recovery-points/\` - 恢复点目录
-- ✅ \`autopilot-session-temp/\` - 临时文件目录
-
-## 下一步操作
-
-1. 开始需求讨论阶段
-2. 生成详细的执行计划
-3. 开始连续自主执行
-
----
-
-**系统状态**: 🟢 初始化完成，准备开始执行
-**建议命令**: \`/autopilot-continuous-start\`
-EOF
-
-    log "初始化报告已生成: $report_file"
+    log "🎉 所有状态文件初始化完成！"
     echo ""
-    echo "🚀 AutoPilot系统初始化完成！"
-    echo "📄 详细报告: $report_file"
-    echo ""
-    echo "现在可以运行: /autopilot-continuous-start"
-}
-
-# 显示使用帮助
-show_help() {
-    echo "Claude Code AutoPilot 系统初始化工具"
-    echo ""
-    echo "用法: $0 [command] [options]"
-    echo ""
-    echo "命令:"
-    echo "  init               初始化AutoPilot系统状态（默认命令）"
-    echo "  check              检查初始化前置条件"
-    echo "  clean              清理已初始化的状态文件"
-    echo "  status             显示当前初始化状态"
-    echo "  help               显示此帮助信息"
-    echo ""
-    echo "选项:"
-    echo "  -f, --force        强制重新初始化，不询问确认"
-    echo "  -q, --quiet        静默模式，减少输出信息"
-    echo "  -v, --verbose      详细模式，显示更多调试信息"
-    echo ""
-    echo "功能特性:"
-    echo "  ✅ 自动生成所有状态文件（JSON格式）"
-    echo "  ✅ 创建唯一会话ID和时间戳"
-    echo "  ✅ 验证系统依赖和环境要求"
-    echo "  ✅ 创建必要的目录结构"
-    echo "  ✅ 生成详细的初始化报告"
-    echo ""
-    echo "初始化的文件:"
+    echo "📁 已创建的文件："
     echo "  - REQUIREMENT_ALIGNMENT.json  需求对齐配置"
     echo "  - EXECUTION_PLAN.json         执行计划配置"
     echo "  - TODO_TRACKER.json          TODO进度跟踪"
     echo "  - DECISION_LOG.json          决策日志记录"
     echo "  - EXECUTION_STATE.json       执行状态管理"
     echo ""
-    echo "示例:"
-    echo "  $0 init                      # 标准初始化"
-    echo "  $0 init --force              # 强制重新初始化"
-    echo "  $0 check                     # 检查初始化条件"
-    echo "  $0 clean                     # 清理状态文件"
+    echo "🚀 现在可以使用AutoPilot命令："
+    echo "  /autopilot-continuous-start  # 开始需求讨论和规划"
+    echo "  /autopilot-status           # 查看当前状态"
     echo ""
-    echo "注意事项:"
-    echo "  - 请在AutoPilot插件根目录下执行"
-    echo "  - 确保所有依赖工具已安装（jq, date, stat, realpath）"
-    echo "  - 初始化将覆盖现有的状态文件"
+    echo "💡 轻量级设计：专注于MD规划文档+JSON状态记录"
 }
 
-# 检查初始化状态
-check_init_status() {
-    echo "🔍 AutoPilot 系统初始化状态检查"
-    echo "==============================="
+# 显示初始化状态
+show_status() {
+    echo "Claude Code AutoPilot 状态检查"
+    echo "============================"
     echo ""
 
     local required_files=(
@@ -401,10 +319,14 @@ check_init_status() {
     )
 
     local all_exists=true
+    local total_size=0
+
     for file in "${required_files[@]}"; do
         if [ -f "$file" ]; then
             local session_id=$(jq -r '.session_id // "未知"' "$file" 2>/dev/null || echo "解析失败")
-            echo "✅ $file (会话ID: $session_id)"
+            local file_size=$(stat -c%s "$file" 2>/dev/null || echo "0")
+            total_size=$((total_size + file_size))
+            echo "✅ $file (会话ID: $session_id, 大小: ${file_size}字节)"
         else
             echo "❌ $file (文件不存在)"
             all_exists=false
@@ -414,31 +336,40 @@ check_init_status() {
     echo ""
     if [ "$all_exists" = true ]; then
         echo "🎉 系统状态: 已完全初始化"
+        echo "📊 总文件大小: ${total_size}字节"
         echo "💡 建议下一步: 运行 /autopilot-continuous-start"
     else
         echo "⚠️  系统状态: 部分或完全未初始化"
-        echo "💡 建议操作: 运行 '$0 init' 进行初始化"
+        echo "💡 建议操作: 运行 '$0' 进行初始化"
     fi
 
     echo ""
-    echo "📁 目录状态:"
-    local dirs=("autopilot-logs" "autopilot-backups" "autopilot-recovery-points" "autopilot-session-temp")
-    for dir in "${dirs[@]}"; do
-        if [ -d "$dir" ]; then
-            local file_count=$(find "$dir" -type f | wc -l)
-            echo "✅ $dir/ ($file_count 个文件)"
-        else
-            echo "❌ $dir/ (目录不存在)"
+    echo "🔧 系统状态："
+
+    # 检查Claude Code
+    if command -v claude &> /dev/null; then
+        echo "  Claude Code CLI: ✅ 已安装"
+    else
+        echo "  Claude Code CLI: ❌ 未安装"
+    fi
+
+    # 检查依赖工具
+    local missing_tools=()
+    for tool in jq date stat realpath; do
+        if ! command -v "$tool" &> /dev/null; then
+            missing_tools+=("$tool")
         fi
     done
+
+    if [ ${#missing_tools[@]} -eq 0 ]; then
+        echo "  系统依赖: ✅ 完整"
+    else
+        echo "  系统依赖: ❌ 缺少 ${missing_tools[*]}"
+    fi
 }
 
-# 清理初始化状态
-clean_init_state() {
-    echo "🧹 清理AutoPilot系统初始化状态"
-    echo "==============================="
-    echo ""
-
+# 卸载状态文件
+uninstall_states() {
     local files_to_remove=(
         "REQUIREMENT_ALIGNMENT.json"
         "EXECUTION_PLAN.json"
@@ -447,147 +378,107 @@ clean_init_state() {
         "EXECUTION_STATE.json"
     )
 
-    local dirs_to_remove=(
-        "autopilot-logs"
-        "autopilot-backups"
-        "autopilot-recovery-points"
-        "autopilot-session-temp"
-    )
-
-    echo "将要删除的文件:"
+    local files_exist=()
     for file in "${files_to_remove[@]}"; do
         if [ -f "$file" ]; then
-            echo "  - $file"
+            files_exist+=("$file")
         fi
     done
 
-    echo ""
-    echo "将要删除的目录:"
-    for dir in "${dirs_to_remove[@]}"; do
-        if [ -d "$dir" ]; then
-            echo "  - $dir/"
-        fi
-    done
-
-    echo ""
-    read -p "确认要删除这些文件和目录吗？(y/N): " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        # 删除文件
-        for file in "${files_to_remove[@]}"; do
-            if [ -f "$file" ]; then
-                rm -f "$file"
-                echo "✅ 已删除: $file"
-            fi
-        done
-
-        # 删除目录
-        for dir in "${dirs_to_remove[@]}"; do
-            if [ -d "$dir" ]; then
-                rm -rf "$dir"
-                echo "✅ 已删除: $dir/"
-            fi
-        done
-
-        echo ""
-        echo "🎉 清理完成！系统已恢复到未初始化状态"
-    else
-        echo "❌ 取消清理操作"
+    if [ ${#files_exist[@]} -eq 0 ]; then
+        warn "未发现任何状态文件"
+        return 0
     fi
+
+    warn "准备删除以下状态文件："
+    for file in "${files_exist[@]}"; do
+        echo "  - $file"
+    done
+    echo ""
+
+    read -p "确认要删除这些文件吗？(y/N): " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo "取消删除"
+        exit 0
+    fi
+
+    for file in "${files_exist[@]}"; do
+        rm -f "$file"
+        log "✅ 已删除: $file"
+    done
+
+    log "🎉 所有状态文件已删除！"
 }
 
-# 主初始化流程
+# 主函数
 main() {
-    local command="${1:-init}"
-    local force_mode=false
-    local quiet_mode=false
-    local verbose_mode=false
+    local action="init"
 
     # 解析命令行参数
     while [[ $# -gt 0 ]]; do
         case $1 in
-            -f|--force)
-                force_mode=true
+            -h|--help)
+                show_help
+                exit 0
+                ;;
+            -u|--uninstall)
+                action="uninstall"
                 shift
                 ;;
-            -q|--quiet)
-                quiet_mode=true
-                shift
+            -v|--version)
+                show_version
+                exit 0
                 ;;
-            -v|--verbose)
-                verbose_mode=true
-                shift
-                ;;
-            init|check|clean|status|help)
-                command="$1"
+            -s|--status)
+                action="status"
                 shift
                 ;;
             *)
-                error "未知参数: $1"
-                show_help
-                exit 1
+                error "未知参数: $1，使用 --help 查看帮助"
                 ;;
         esac
     done
 
-    case "$command" in
-        "help"|"--help"|"-h")
-            show_help
-            ;;
-        "check")
-            check_dependencies || exit 1
-            validate_environment || exit 1
-            echo "✅ 所有检查通过，系统可以正常初始化"
-            ;;
-        "status")
-            check_init_status
-            ;;
-        "clean")
-            clean_init_state
-            ;;
+    case "$action" in
         "init")
-            if [ "$quiet_mode" != true ]; then
-                echo "🚀 Claude Code AutoPilot 系统初始化"
-                echo "=================================="
-                echo ""
-            fi
-
             # 检查是否已经初始化
             if [ -f "REQUIREMENT_ALIGNMENT.json" ] && [ -f "EXECUTION_PLAN.json" ]; then
-                if [ "$force_mode" != true ]; then
-                    warn "检测到状态文件已存在"
-                    read -p "是否要重新初始化？这将覆盖现有状态 (y/N): " -n 1 -r
-                    echo
-                    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-                        log "保持现有状态，初始化取消"
-                        exit 0
-                    fi
-                else
-                    if [ "$quiet_mode" != true ]; then
-                        warn "强制模式：覆盖现有状态文件"
-                    fi
+                warn "检测到状态文件已存在"
+                read -p "是否要重新初始化？这将覆盖现有状态 (y/N): " -n 1 -r
+                echo
+                if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                    log "保持现有状态，初始化取消"
+                    exit 0
                 fi
             fi
 
-            # 执行初始化流程
-            check_dependencies || exit 1
-            validate_environment || exit 1
-            create_directories
-            init_requirement_alignment || exit 1
-            init_execution_plan || exit 1
-            init_todo_tracker || exit 1
-            init_decision_log || exit 1
-            init_execution_state || exit 1
-            generate_init_report
-
-            if [ "$quiet_mode" != true ]; then
-                log "🎉 系统初始化成功完成！"
+            # 检查模板文件是否存在
+            if [ ! -d "templates" ]; then
+                error "templates目录不存在，请确保在正确的项目目录中执行"
             fi
+
+            local required_templates=(
+                "templates/REQUIREMENT_ALIGNMENT.json"
+                "templates/EXECUTION_PLAN.json"
+                "templates/TODO_TRACKER.json"
+                "templates/DECISION_LOG.json"
+                "templates/EXECUTION_STATE.json"
+            )
+
+            for template in "${required_templates[@]}"; do
+                if [ ! -f "$template" ]; then
+                    error "缺少模板文件: $template"
+                fi
+            done
+
+            init_all_states
             ;;
-        *)
-            error "未知命令: $command"
-            show_help
-            exit 1
+        "status")
+            show_status
+            ;;
+        "uninstall")
+            uninstall_states
             ;;
     esac
 }
