@@ -31,18 +31,15 @@ Claude Code AutoPilot是一个**完全无人值守的项目执行系统**，能�
 ### 5分钟快速体验
 
 ```bash
-# 1. 克隆项目
+# 1. 下载插件源码（只需要执行一次）
 git clone https://github.com/x-rush/claude-code-autopilot.git
-cd claude-code-autopilot
 
-# 2. 启动Claude Code
+# 2. 在项目中安装
+cd your-project
+bash /path/to/claude-code-autopilot/install.sh
+
+# 3. 启动Claude Code并开始使用
 claude --dangerously-skip-permissions
-
-# 3. 安装插件
-/plugin marketplace add ../autopilot-marketplace
-/plugin install claude-code-autopilot@autopilot-marketplace
-
-# 4. 开始使用
 /autopilot-continuous-start
 ```
 
@@ -76,38 +73,53 @@ brew install jq coreutils curl
 
 ### 插件安装
 
-#### 本地开发安装
+#### 项目级安装（推荐）
+
+**安装步骤**
 ```bash
-# 1. 克隆项目
+# 1. 下载插件源码（只需要执行一次）
 git clone https://github.com/x-rush/claude-code-autopilot.git
-cd claude-code-autopilot
 
-# 2. 创建本地marketplace
-mkdir ../autopilot-marketplace
-cd ../autopilot-marketplace
-
-# 3. 创建marketplace配置
-cat > marketplace.json << 'EOF'
-{
-  "name": "autopilot-marketplace",
-  "owner": {
-    "name": "AutoPilot Team"
-  },
-  "plugins": [
-    {
-      "name": "claude-code-autopilot",
-      "source": "../claude-code-autopilot",
-      "description": "Claude Code AutoPilot - 无人值守项目执行系统"
-    }
-  ]
-}
-EOF
-
-# 4. 安装插件
-claude --dangerously-skip-permissions
-/plugin marketplace add ../autopilot-marketplace
-/plugin install claude-code-autopilot@autopilot-marketplace
+# 2. 在任意项目中安装
+cd your-project
+bash /path/to/claude-code-autopilot/install.sh
 ```
+
+**安装过程**
+安装脚本会自动：
+- 检查系统依赖（jq, curl等）
+- 在当前项目创建 `.claude/plugins/claude-code-autopilot/` 目录
+- 复制所有必要的插件文件到项目目录
+- Claude Code 启动时自动发现并加载插件
+
+**直接使用**
+```bash
+# 安装完成后，直接启动Claude Code即可使用
+claude --dangerously-skip-permissions
+/autopilot-continuous-start
+```
+
+#### 管理命令
+
+在项目目录中执行以下命令：
+
+```bash
+# 查看安装状态
+bash .claude/plugins/claude-code-autopilot/install.sh --status
+
+# 卸载当前项目的插件
+bash .claude/plugins/claude-code-autopilot/install.sh --uninstall
+
+# 查看帮助信息
+bash .claude/plugins/claude-code-autopilot/install.sh --help
+```
+
+#### 安装原理
+
+- **项目隔离**：每个项目独立管理插件文件
+- **自动发现**：Claude Code 自动识别 `.claude/plugins/` 目录中的插件
+- **无需配置**：不需要手动配置marketplace或插件路径
+- **完全独立**：不同项目间的插件版本和配置完全隔离
 
 ### 验证安装
 ```bash

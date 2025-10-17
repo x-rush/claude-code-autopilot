@@ -58,43 +58,55 @@ done
 
 ### 1. 安装插件
 
-#### 本地开发安装
+#### 项目级安装（推荐）
+
+**步骤1：下载插件源码**
 ```bash
-# 1. 克隆插件仓库
+# 克隆插件仓库（只需要执行一次）
 git clone https://github.com/x-rush/claude-code-autopilot.git
-cd claude-code-autopilot
-
-# 2. 创建本地marketplace
-mkdir ../autopilot-marketplace
-cd ../autopilot-marketplace
-
-# 3. 创建marketplace配置
-cat > marketplace.json << 'EOF'
-{
-  "name": "autopilot-marketplace",
-  "owner": {
-    "name": "AutoPilot Team"
-  },
-  "plugins": [
-    {
-      "name": "claude-code-autopilot",
-      "source": "../claude-code-autopilot",
-      "description": "Claude Code AutoPilot - 无人值守项目执行系统"
-    }
-  ]
-}
-EOF
-
-# 4. 启动Claude Code并安装
-claude --dangerously-skip-permissions
-/plugin marketplace add ./autopilot-marketplace
-/plugin install claude-code-autopilot@autopilot-marketplace
 ```
 
-**说明**：
-- 这是目前最稳定可靠的安装方式
-- 本地marketplace确保插件能够正确加载
-- 避免了远程marketplace的配置复杂性
+**步骤2：在项目中安装**
+```bash
+# 在任意项目目录中
+cd your-project
+
+# 运行安装脚本（指定插件源码路径）
+bash /path/to/claude-code-autopilot/install.sh
+```
+
+**步骤3：启动使用**
+```bash
+# 启动Claude Code
+claude --dangerously-skip-permissions
+
+# 直接开始使用AutoPilot
+/autopilot-continuous-start
+```
+
+**优势**：
+- ✅ **真正的项目独立性**：每个项目独立管理插件
+- ✅ **无需全局配置**：不依赖系统级安装或权限
+- ✅ **简单直接**：一条命令完成项目安装
+- ✅ **自动发现**：Claude Code自动识别项目级插件
+- ✅ **完全隔离**：不同项目间的插件完全独立
+
+**管理命令**（在项目目录中执行）：
+```bash
+# 查看安装状态
+bash .claude/plugins/claude-code-autopilot/install.sh --status
+
+# 卸载插件
+bash .claude/plugins/claude-code-autopilot/install.sh --uninstall
+
+# 查看帮助
+bash .claude/plugins/claude-code-autopilot/install.sh --help
+```
+
+**安装原理**：
+- 插件文件复制到项目的 `.claude/plugins/claude-code-autopilot/` 目录
+- Claude Code 启动时自动发现并加载项目级插件
+- 无需手动配置marketplace或插件路径
 
 ### 2. 启动AutoPilot
 
