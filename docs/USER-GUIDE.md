@@ -76,7 +76,7 @@ brew install jq coreutils curl
 
 ### 插件安装
 
-#### 方法1：本地开发安装（推荐）
+#### 本地开发安装
 ```bash
 # 1. 克隆项目
 git clone https://github.com/x-rush/claude-code-autopilot.git
@@ -107,29 +107,6 @@ EOF
 claude --dangerously-skip-permissions
 /plugin marketplace add ../autopilot-marketplace
 /plugin install claude-code-autopilot@autopilot-marketplace
-```
-
-#### 方法2：团队共享安装
-```bash
-# 在项目根目录创建配置
-echo '{
-  "enabledPlugins": {
-    "claude-code-autopilot@autopilot-marketplace": true
-  },
-  "extraKnownMarketplaces": {
-    "autopilot-marketplace": {
-      "source": {
-        "source": "github",
-        "repo": "x-rush/claude-code-autopilot"
-      }
-    }
-  }
-}' > .claude/settings.json
-
-# 团队成员使用
-cd your-project
-claude --dangerously-skip-permissions
-/trust-folder
 ```
 
 ### 验证安装

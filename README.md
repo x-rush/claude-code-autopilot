@@ -58,7 +58,7 @@ done
 
 ### 1. 安装插件
 
-#### 方法1：本地开发安装 (推荐)
+#### 本地开发安装
 ```bash
 # 1. 克隆插件仓库
 git clone https://github.com/x-rush/claude-code-autopilot.git
@@ -86,33 +86,15 @@ cat > marketplace.json << 'EOF'
 EOF
 
 # 4. 启动Claude Code并安装
-claude
+claude --dangerously-skip-permissions
 /plugin marketplace add ./autopilot-marketplace
 /plugin install claude-code-autopilot@autopilot-marketplace
 ```
 
-#### 方法2：团队共享安装
-```bash
-# 在你的项目根目录添加配置
-echo '{
-  "enabledPlugins": {
-    "claude-code-autopilot@autopilot-marketplace": true
-  },
-  "extraKnownMarketplaces": {
-    "autopilot-marketplace": {
-      "source": {
-        "source": "github",
-        "repo": "x-rush/claude-code-autopilot"
-      }
-    }
-  }
-}' > .claude/settings.json
-
-# 团队成员使用
-cd your-project
-claude --dangerously-skip-permissions
-/trust-folder  # 自动安装配置的插件
-```
+**说明**：
+- 这是目前最稳定可靠的安装方式
+- 本地marketplace确保插件能够正确加载
+- 避免了远程marketplace的配置复杂性
 
 ### 2. 启动AutoPilot
 
