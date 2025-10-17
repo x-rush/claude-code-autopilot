@@ -38,12 +38,46 @@ check_state_files() {
         "EXECUTION_STATE.json"
     )
 
+    local missing_files=()
+    local corrupted_files=()
+
     for file in "${required_files[@]}"; do
         if [ ! -f "$file" ]; then
-            error "状态文件不存在: $file"
-            return 1
+            missing_files+=("$file")
+        elif [ ! -s "$file" ]; then
+            warn "状态文件为空: $file"
+            corrupted_files+=("$file")
+        elif ! jq empty "$file" 2>/dev/null; then
+            warn "状态文件JSON格式错误: $file"
+            corrupted_files+=("$file")
         fi
     done
+
+    # 报告缺失文件
+    if [ ${#missing_files[@]} -gt 0 ]; then
+        error "以下状态文件不存在:"
+        for file in "${missing_files[@]}"; do
+            echo "  - $file"
+        done
+        echo ""
+        echo "建议解决方案:"
+        echo "  1. 运行 './scripts/init-session.sh' 进行初始化"
+        echo "  2. 或者从备份目录恢复状态文件"
+        return 1
+    fi
+
+    # 报告损坏文件
+    if [ ${#corrupted_files[@]} -gt 0 ]; then
+        error "以下状态文件已损坏或格式错误:"
+        for file in "${corrupted_files[@]}"; do
+            echo "  - $file"
+        done
+        echo ""
+        echo "建议解决方案:"
+        echo "  1. 运行 './scripts/init-session.sh --force' 重新初始化"
+        echo "  2. 检查备份目录是否有可用备份"
+        return 1
+    fi
 
     return 0
 }
@@ -78,7 +112,46 @@ update_todo_progress() {
     local notes="${3:-""}"
     local quality_score="${4:-0}"
 
+    # 验证参数
+    if [ -z "$todo_id" ] || [ -z "$status" ]; then
+        error "TODO ID和状态参数不能为空"
+        return 1
+    fi
+
+    # 验证状态值
+    local valid_statuses=("pending" "in_progress" "completed" "failed" "skipped")
+    local status_valid=false
+    for valid_status in "${valid_statuses[@]}"; do
+        if [ "$status" = "$valid_status" ]; then
+            status_valid=true
+            break
+        fi
+    done
+
+    if [ "$status_valid" = false ]; then
+        error "无效的状态值: $status"
+        error "有效状态值: ${valid_statuses[*]}"
+        return 1
+    fi
+
+    # 验证质量分数范围
+    if [[ "$quality_score" =~ ^[0-9]+$ ]] && [ "$quality_score" -ge 0 ] && [ "$quality_score" -le 10 ]; then
+        : # 质量分数有效
+    else
+        error "质量分数必须是0-10之间的整数，当前值: $quality_score"
+        return 1
+    fi
+
     log "更新TODO进度: $todo_id -> $status"
+
+    # 检查状态文件是否存在
+    if [ ! -f "TODO_TRACKER.json" ]; then
+        error "TODO_TRACKER.json文件不存在"
+        return 1
+    fi
+
+    # 备份当前状态
+    cp TODO_TRACKER.json TODO_TRACKER.json.backup 2>/dev/null || true
 
     # 更新TODO_TRACKER.json
     local timestamp=$(date -Iseconds)
@@ -86,11 +159,11 @@ update_todo_progress() {
     # 查找并更新对应的TODO
     local todo_found=$(jq --arg todo_id "$todo_id" \
         '.todo_tracker.todo_progress[] | select(.todo_id == $todo_id)' \
-        TODO_TRACKER.json)
+        TODO_TRACKER.json 2>/dev/null || echo "")
 
     if [ -n "$todo_found" ]; then
         # 更新现有TODO
-        jq --arg todo_id "$todo_id" \
+        if ! jq --arg todo_id "$todo_id" \
            --arg status "$status" \
            --arg timestamp "$timestamp" \
            --arg notes "$notes" \
@@ -105,44 +178,81 @@ update_todo_progress() {
                quality_score: (if $status == "completed" then $quality_score else .quality_score end),
                progress_percentage: (if $status == "completed" then 100 else (if $status == "in_progress" then 50 else 0 end) end)
            } + .' \
-           TODO_TRACKER.json > TODO_TRACKER.json.tmp && mv TODO_TRACKER.json.tmp TODO_TRACKER.json
+           TODO_TRACKER.json > TODO_TRACKER.json.tmp 2>/dev/null; then
+            error "更新TODO记录失败"
+            if [ -f "TODO_TRACKER.json.backup" ]; then
+                mv TODO_TRACKER.json.backup TODO_TRACKER.json
+            fi
+            return 1
+        fi
     else
         # 创建新TODO记录
-        local todo_title=$(jq --arg todo_id "$todo_id" \
-            '.execution_plan.execution_todos[] | select(.todo_id == $todo_id) | .title' \
-            EXECUTION_PLAN.json | tr -d '"')
+        local todo_title=""
+        if [ -f "EXECUTION_PLAN.json" ]; then
+            todo_title=$(jq --arg todo_id "$todo_id" \
+                '.execution_plan.execution_todos[] | select(.todo_id == $todo_id) | .title' \
+                EXECUTION_PLAN.json 2>/dev/null | tr -d '"' || echo "")
+        fi
 
-        if [ -n "$todo_title" ]; then
-            jq --arg todo_id "$todo_id" \
-               --arg title "$todo_title" \
-               --arg status "$status" \
-               --arg timestamp "$timestamp" \
-               --arg notes "$notes" \
-               --argjson quality_score "$quality_score" \
-               '.todo_tracker.todo_progress += [{
-                   todo_id: $todo_id,
-                   title: $title,
-                   status: $status,
-                   start_time: (if $status == "in_progress" then $timestamp else null end),
-                   end_time: (if $status == "completed" or $status == "failed" then $timestamp else null end),
-                   duration_minutes: 0,
-                   estimated_minutes: 0,
-                   quality_score: (if $status == "completed" then $quality_score else 0),
-                   retry_count: 0,
-                   progress_percentage: (if $status == "completed" then 100 else (if $status == "in_progress" then 50 else 0 end) end),
-                   acceptance_criteria_results: [],
-                   self_check_results: [],
-                   error_history: [],
-                   outputs_generated: []
-               }]' \
-               TODO_TRACKER.json > TODO_TRACKER.json.tmp && mv TODO_TRACKER.json.tmp TODO_TRACKER.json
+        if [ -z "$todo_title" ]; then
+            warn "在EXECUTION_PLAN.json中未找到TODO ID: $todo_id"
+            todo_title="未知任务 ($todo_id)"
+        fi
+
+        if ! jq --arg todo_id "$todo_id" \
+           --arg title "$todo_title" \
+           --arg status "$status" \
+           --arg timestamp "$timestamp" \
+           --arg notes "$notes" \
+           --argjson quality_score "$quality_score" \
+           '.todo_tracker.todo_progress += [{
+               todo_id: $todo_id,
+               title: $title,
+               status: $status,
+               start_time: (if $status == "in_progress" then $timestamp else null end),
+               end_time: (if $status == "completed" or $status == "failed" then $timestamp else null end),
+               duration_minutes: 0,
+               estimated_minutes: 0,
+               quality_score: (if $status == "completed" then $quality_score else 0),
+               retry_count: 0,
+               progress_percentage: (if $status == "completed" then 100 else (if $status == "in_progress" then 50 else 0 end) end),
+               acceptance_criteria_results: [],
+               self_check_results: [],
+               error_history: [],
+               outputs_generated: []
+           }]' \
+           TODO_TRACKER.json > TODO_TRACKER.json.tmp 2>/dev/null; then
+            error "创建新TODO记录失败"
+            if [ -f "TODO_TRACKER.json.backup" ]; then
+                mv TODO_TRACKER.json.backup TODO_TRACKER.json
+            fi
+            return 1
         fi
     fi
 
+    # 验证生成的文件
+    if ! jq empty TODO_TRACKER.json.tmp 2>/dev/null; then
+        error "生成的TODO_TRACKER.json.tmp文件格式错误"
+        if [ -f "TODO_TRACKER.json.backup" ]; then
+            mv TODO_TRACKER.json.backup TODO_TRACKER.json
+        fi
+        return 1
+    fi
+
+    # 替换原文件
+    mv TODO_TRACKER.json.tmp TODO_TRACKER.json
+
+    # 清理备份文件
+    rm -f TODO_TRACKER.json.backup
+
     # 重新计算总体进度
-    recalculate_progress
+    if ! recalculate_progress; then
+        error "重新计算进度失败"
+        return 1
+    fi
 
     log "TODO进度更新完成: $todo_id"
+    return 0
 }
 
 # 重新计算总体进度

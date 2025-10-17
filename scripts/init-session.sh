@@ -342,35 +342,254 @@ EOF
     echo "现在可以运行: /autopilot-continuous-start"
 }
 
-# 主初始化流程
-main() {
-    echo "🚀 Claude Code AutoPilot 系统初始化"
-    echo "=================================="
+# 显示使用帮助
+show_help() {
+    echo "Claude Code AutoPilot 系统初始化工具"
+    echo ""
+    echo "用法: $0 [command] [options]"
+    echo ""
+    echo "命令:"
+    echo "  init               初始化AutoPilot系统状态（默认命令）"
+    echo "  check              检查初始化前置条件"
+    echo "  clean              清理已初始化的状态文件"
+    echo "  status             显示当前初始化状态"
+    echo "  help               显示此帮助信息"
+    echo ""
+    echo "选项:"
+    echo "  -f, --force        强制重新初始化，不询问确认"
+    echo "  -q, --quiet        静默模式，减少输出信息"
+    echo "  -v, --verbose      详细模式，显示更多调试信息"
+    echo ""
+    echo "功能特性:"
+    echo "  ✅ 自动生成所有状态文件（JSON格式）"
+    echo "  ✅ 创建唯一会话ID和时间戳"
+    echo "  ✅ 验证系统依赖和环境要求"
+    echo "  ✅ 创建必要的目录结构"
+    echo "  ✅ 生成详细的初始化报告"
+    echo ""
+    echo "初始化的文件:"
+    echo "  - REQUIREMENT_ALIGNMENT.json  需求对齐配置"
+    echo "  - EXECUTION_PLAN.json         执行计划配置"
+    echo "  - TODO_TRACKER.json          TODO进度跟踪"
+    echo "  - DECISION_LOG.json          决策日志记录"
+    echo "  - EXECUTION_STATE.json       执行状态管理"
+    echo ""
+    echo "示例:"
+    echo "  $0 init                      # 标准初始化"
+    echo "  $0 init --force              # 强制重新初始化"
+    echo "  $0 check                     # 检查初始化条件"
+    echo "  $0 clean                     # 清理状态文件"
+    echo ""
+    echo "注意事项:"
+    echo "  - 请在AutoPilot插件根目录下执行"
+    echo "  - 确保所有依赖工具已安装（jq, date, stat, realpath）"
+    echo "  - 初始化将覆盖现有的状态文件"
+}
+
+# 检查初始化状态
+check_init_status() {
+    echo "🔍 AutoPilot 系统初始化状态检查"
+    echo "==============================="
     echo ""
 
-    # 检查是否已经初始化
-    if [ -f "REQUIREMENT_ALIGNMENT.json" ] && [ -f "EXECUTION_PLAN.json" ]; then
-        warn "检测到状态文件已存在"
-        read -p "是否要重新初始化？这将覆盖现有状态 (y/N): " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            log "保持现有状态，初始化取消"
-            exit 0
+    local required_files=(
+        "REQUIREMENT_ALIGNMENT.json"
+        "EXECUTION_PLAN.json"
+        "TODO_TRACKER.json"
+        "DECISION_LOG.json"
+        "EXECUTION_STATE.json"
+    )
+
+    local all_exists=true
+    for file in "${required_files[@]}"; do
+        if [ -f "$file" ]; then
+            local session_id=$(jq -r '.session_id // "未知"' "$file" 2>/dev/null || echo "解析失败")
+            echo "✅ $file (会话ID: $session_id)"
+        else
+            echo "❌ $file (文件不存在)"
+            all_exists=false
         fi
+    done
+
+    echo ""
+    if [ "$all_exists" = true ]; then
+        echo "🎉 系统状态: 已完全初始化"
+        echo "💡 建议下一步: 运行 /autopilot-continuous-start"
+    else
+        echo "⚠️  系统状态: 部分或完全未初始化"
+        echo "💡 建议操作: 运行 '$0 init' 进行初始化"
     fi
 
-    # 执行初始化流程
-    check_dependencies || exit 1
-    validate_environment || exit 1
-    create_directories
-    init_requirement_alignment || exit 1
-    init_execution_plan || exit 1
-    init_todo_tracker || exit 1
-    init_decision_log || exit 1
-    init_execution_state || exit 1
-    generate_init_report
+    echo ""
+    echo "📁 目录状态:"
+    local dirs=("autopilot-logs" "autopilot-backups" "autopilot-recovery-points" "autopilot-session-temp")
+    for dir in "${dirs[@]}"; do
+        if [ -d "$dir" ]; then
+            local file_count=$(find "$dir" -type f | wc -l)
+            echo "✅ $dir/ ($file_count 个文件)"
+        else
+            echo "❌ $dir/ (目录不存在)"
+        fi
+    done
+}
 
-    log "🎉 系统初始化成功完成！"
+# 清理初始化状态
+clean_init_state() {
+    echo "🧹 清理AutoPilot系统初始化状态"
+    echo "==============================="
+    echo ""
+
+    local files_to_remove=(
+        "REQUIREMENT_ALIGNMENT.json"
+        "EXECUTION_PLAN.json"
+        "TODO_TRACKER.json"
+        "DECISION_LOG.json"
+        "EXECUTION_STATE.json"
+    )
+
+    local dirs_to_remove=(
+        "autopilot-logs"
+        "autopilot-backups"
+        "autopilot-recovery-points"
+        "autopilot-session-temp"
+    )
+
+    echo "将要删除的文件:"
+    for file in "${files_to_remove[@]}"; do
+        if [ -f "$file" ]; then
+            echo "  - $file"
+        fi
+    done
+
+    echo ""
+    echo "将要删除的目录:"
+    for dir in "${dirs_to_remove[@]}"; do
+        if [ -d "$dir" ]; then
+            echo "  - $dir/"
+        fi
+    done
+
+    echo ""
+    read -p "确认要删除这些文件和目录吗？(y/N): " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        # 删除文件
+        for file in "${files_to_remove[@]}"; do
+            if [ -f "$file" ]; then
+                rm -f "$file"
+                echo "✅ 已删除: $file"
+            fi
+        done
+
+        # 删除目录
+        for dir in "${dirs_to_remove[@]}"; do
+            if [ -d "$dir" ]; then
+                rm -rf "$dir"
+                echo "✅ 已删除: $dir/"
+            fi
+        done
+
+        echo ""
+        echo "🎉 清理完成！系统已恢复到未初始化状态"
+    else
+        echo "❌ 取消清理操作"
+    fi
+}
+
+# 主初始化流程
+main() {
+    local command="${1:-init}"
+    local force_mode=false
+    local quiet_mode=false
+    local verbose_mode=false
+
+    # 解析命令行参数
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -f|--force)
+                force_mode=true
+                shift
+                ;;
+            -q|--quiet)
+                quiet_mode=true
+                shift
+                ;;
+            -v|--verbose)
+                verbose_mode=true
+                shift
+                ;;
+            init|check|clean|status|help)
+                command="$1"
+                shift
+                ;;
+            *)
+                error "未知参数: $1"
+                show_help
+                exit 1
+                ;;
+        esac
+    done
+
+    case "$command" in
+        "help"|"--help"|"-h")
+            show_help
+            ;;
+        "check")
+            check_dependencies || exit 1
+            validate_environment || exit 1
+            echo "✅ 所有检查通过，系统可以正常初始化"
+            ;;
+        "status")
+            check_init_status
+            ;;
+        "clean")
+            clean_init_state
+            ;;
+        "init")
+            if [ "$quiet_mode" != true ]; then
+                echo "🚀 Claude Code AutoPilot 系统初始化"
+                echo "=================================="
+                echo ""
+            fi
+
+            # 检查是否已经初始化
+            if [ -f "REQUIREMENT_ALIGNMENT.json" ] && [ -f "EXECUTION_PLAN.json" ]; then
+                if [ "$force_mode" != true ]; then
+                    warn "检测到状态文件已存在"
+                    read -p "是否要重新初始化？这将覆盖现有状态 (y/N): " -n 1 -r
+                    echo
+                    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                        log "保持现有状态，初始化取消"
+                        exit 0
+                    fi
+                else
+                    if [ "$quiet_mode" != true ]; then
+                        warn "强制模式：覆盖现有状态文件"
+                    fi
+                fi
+            fi
+
+            # 执行初始化流程
+            check_dependencies || exit 1
+            validate_environment || exit 1
+            create_directories
+            init_requirement_alignment || exit 1
+            init_execution_plan || exit 1
+            init_todo_tracker || exit 1
+            init_decision_log || exit 1
+            init_execution_state || exit 1
+            generate_init_report
+
+            if [ "$quiet_mode" != true ]; then
+                log "🎉 系统初始化成功完成！"
+            fi
+            ;;
+        *)
+            error "未知命令: $command"
+            show_help
+            exit 1
+            ;;
+    esac
 }
 
 # 脚本入口
