@@ -9,7 +9,8 @@
 - [开发环境设置](#开发环境设置)
 - [项目结构](#项目结构)
 - [开发工作流](#开发工作流)
-- [代码规范](#代码规范)
+- [slash命令开发](#slash命令开发)
+- [JSON状态文件设计](#json状态文件设计)
 - [测试指南](#测试指南)
 - [发布流程](#发布流程)
 - [故障排除](#故障排除)
@@ -20,41 +21,32 @@
 
 ### 系统要求
 - **操作系统**: Linux, macOS, Windows (WSL2)
-- **Bash版本**: 4.0+
-- **依赖工具**: jq 1.6+, awk, curl, date, stat, realpath
+- **Claude Code**: 已安装并正常运行
+- **文本编辑器**: 任何支持Markdown和JSON的编辑器
 
-### 开发工具安装
+### 开发工具推荐
 
-#### Ubuntu/Debian
+#### 文本编辑器/IDE
+- **VS Code**: 支持Markdown和JSON语法高亮
+- **Vim/Neovim**: 轻量级，支持多种文件类型
+- **Sublime Text**: 优秀的Markdown和JSON支持
+
+#### 有用插件
+- **Markdown Preview**: 实时预览Markdown文档
+- **JSON Lint**: JSON格式验证
+- **Git Integration**: 版本控制集成
+
+### 验证开发环境
 ```bash
-sudo apt-get update
-sudo apt-get install jq coreutils curl git vim
-```
+# 检查Claude Code
+claude --version
 
-#### macOS
-```bash
-brew install jq coreutils curl git vim
-```
+# 测试基本功能
+claude --dangerously-skip-permissions
+/help
 
-#### Windows (WSL2)
-```bash
-sudo apt-get update
-sudo apt-get install jq coreutils curl git vim
-```
-
-### IDE/编辑器配置
-推荐使用支持Bash语法高亮的编辑器：
-- VS Code + Bash extension
-- Vim + bash-support plugin
-- Sublime Text + ShellScript package
-
-### 代码质量工具
-```bash
-# ShellCheck - Bash脚本静态分析
-sudo apt-get install shellcheck
-
-# 安装
-shellcheck scripts/*.sh
+# 验证插件加载
+/help | grep autopilot
 ```
 
 ---
@@ -67,29 +59,23 @@ claude-code-autopilot/
 │   └── plugin.json            # 插件清单文件
 ├── commands/                   # Slash命令定义
 │   ├── autopilot-continuous-start.md
+│   ├── autopilot-execute.md
+│   ├── autopilot-align.md
 │   ├── autopilot-status.md
 │   ├── autopilot-context-refresh.md
 │   └── autopilot-recovery.md
-├── scripts/                    # 核心执行脚本
-│   ├── init-session.sh        # 系统初始化
-│   ├── state-manager.sh       # 状态管理
-│   ├── execution-monitor.sh   # 监控系统
-│   └── autopilot-engine.sh    # 执行引擎
-├── templates/                  # 状态文件模板
+├── templates/                  # JSON状态文件模板
 │   ├── REQUIREMENT_ALIGNMENT.json
 │   ├── EXECUTION_PLAN.json
 │   ├── TODO_TRACKER.json
 │   ├── DECISION_LOG.json
 │   └── EXECUTION_STATE.json
+├── scripts/                    # 辅助脚本（可选）
+│   └── init-session.sh        # 系统初始化脚本
 ├── docs/                       # 文档目录
 │   ├── API-REFERENCE.md
 │   ├── DEVELOPMENT-GUIDE.md
 │   └── USER-GUIDE.md
-├── tests/                      # 测试文件
-│   └── integration/
-├── autopilot-logs/              # 运行时日志
-├── autopilot-backups/           # 状态备份
-├── autopilot-recovery-points/    # 恢复检查点
 └── README.md                   # 项目说明文档
 ```
 
@@ -99,13 +85,13 @@ claude-code-autopilot/
 Claude Code插件的核心配置文件，定义插件的基本信息和能力。
 
 #### `commands/`
-Slash命令定义文件，每个Markdown文件对应一个命令。
-
-#### `scripts/`
-核心执行脚本，实现自动化功能。
+**核心目录**：包含所有slash命令的Markdown文件。每个文件对应一个功能命令，包含YAML前置元数据和Markdown内容。
 
 #### `templates/`
-JSON状态文件模板，用于初始化系统状态。
+JSON状态文件模板，用于初始化和验证系统状态。这些文件定义了系统的数据结构。
+
+#### `scripts/`（可选）
+辅助脚本目录，仅包含必要的初始化脚本。主要功能通过slash命令实现。
 
 ---
 
@@ -113,32 +99,30 @@ JSON状态文件模板，用于初始化系统状态。
 
 ### 1. 功能开发流程
 
-#### 步骤1: 需求分析
+#### 步骤1: 需求分析和设计
 ```bash
 # 创建功能开发分支
 git checkout -b feature/new-feature
 
-# 分析需求并设计API
-# 设计JSON数据结构
-# 规划命令行接口
+# 分析需求并设计
+# - 确定命令名称和功能
+# - 设计JSON数据结构
+# - 规划用户交互流程
 ```
 
-#### 步骤2: 核心脚本开发
+#### 步骤2: 创建slash命令
 ```bash
-# 创建新的脚本文件
-cp scripts/state-manager.sh scripts/new-feature.sh
+# 创建新的命令文件
+touch commands/autopilot-new-feature.md
 
-# 编辑脚本，实现核心功能
-vim scripts/new-feature.sh
-
-# 测试脚本语法
-bash -n scripts/new-feature.sh
+# 编辑命令，实现功能逻辑
+vim commands/autopilot-new-feature.md
 ```
 
-#### 步骤3: 状态文件模板
+#### 步骤3: 设计JSON模板（如需要）
 ```bash
 # 创建新的JSON模板
-cp templates/TODO_TRACKER.json templates/NEW_FEATURE.json
+touch templates/NEW_FEATURE.json
 
 # 编辑模板结构
 vim templates/NEW_FEATURE.json
@@ -146,12 +130,13 @@ vim templates/NEW_FEATURE.json
 
 #### 步骤4: 集成测试
 ```bash
-# 测试新功能
-./scripts/new-feature.sh test
+# 测试新命令
+claude --dangerously-skip-permissions
+/autopilot-new-feature --help
 
 # 验证与现有组件的集成
-./scripts/state-manager.sh status
-./scripts/execution-monitor.sh check
+/autopilot-status
+/autopilot-align
 ```
 
 #### 步骤5: 文档更新
@@ -166,233 +151,221 @@ vim docs/USER-GUIDE.md
 vim README.md
 ```
 
-### 2. 测试流程
+### 2. 开发原则
 
-#### 单元测试
-```bash
-# 测试脚本语法
-for script in scripts/*.sh; do
-    echo "Testing $script..."
-    bash -n "$script" || echo "Syntax error in $script"
-done
+#### 纯插件实现
+- **无外部依赖**: 不依赖shell脚本或外部工具
+- **原生能力**: 充分利用Claude Code的原生功能
+- **状态驱动**: 通过JSON文件管理状态和进度
+- **用户交互**: 通过对话界面进行交互
+
+#### 设计模式
+- **命令单一职责**: 每个slash命令专注一个功能
+- **状态一致性**: 确保所有状态文件的数据一致性
+- **错误恢复**: 提供完整的错误检测和恢复机制
+- **用户体验**: 优先考虑用户体验和易用性
+
+---
+
+## 📝 slash命令开发
+
+### 基本结构
+
+每个slash命令都是一个Markdown文件，包含以下结构：
+
+```markdown
+---
+description: 命令简要描述
+---
+
+# /command-name
+命令的详细描述
+
+## 功能说明
+详细解释命令的作用和使用场景...
+
+## 使用方法
+命令的具体使用方法...
+
+## 参数说明
+如果命令支持参数，说明各参数的作用...
+
+## 示例
+提供具体的使用示例...
 ```
 
-#### 功能测试
+### 开发指南
+
+#### 1. 命令命名规范
+- 使用清晰的描述性名称
+- 采用`autopilot-功能名`的命名格式
+- 避免过于简短或模糊的名称
+
+#### 2. 功能设计原则
+- **明确目标**: 每个命令有明确的功能目标
+- **用户友好**: 提供清晰的说明和反馈
+- **错误处理**: 处理各种异常情况并提供有用的错误信息
+- **状态管理**: 正确读取和更新相关JSON文件
+
+#### 3. 交互设计
+- **引导式交互**: 通过问题引导用户完成操作
+- **进度反馈**: 实时显示操作进度和状态
+- **确认机制**: 重要操作前请求用户确认
+- **结果展示**: 清晰展示操作结果
+
+### 命令模板
+
+#### 基础命令模板
+```markdown
+---
+description: 新功能命令的简要描述
+---
+
+# /autopilot-new-feature
+新功能命令的详细描述。
+
+## 功能说明
+这个命令用于实现特定的功能...
+
+## 使用方法
 ```bash
-# 测试初始化
-./scripts/init-session.sh clean
-./scripts/init-session.sh init
-
-# 测试状态管理
-./scripts/state-manager.sh check
-./scripts/state-manager.sh status
-
-# 测试监控系统
-./scripts/execution-monitor.sh status
+/autopilot-new-feature [参数]
 ```
 
-#### 集成测试
-```bash
-# 运行完整测试套件
-./test-plugin.sh
+## 参数说明
+- `参数1`: 参数描述
+- `--option`: 选项描述
 
-# 创建测试场景
-./tests/integration/full-workflow-test.sh
+## 功能流程
+1. **第一步**: 描述第一个步骤
+2. **第二步**: 描述第二个步骤
+3. **第三步**: 描述第三个步骤
+
+## 示例
+```
+用户: /autopilot-new-feature
+系统: 开始执行新功能...
+
+✅ 第一步完成
+📋 处理结果: ...
+✅ 功能执行完成
 ```
 
-### 3. 代码审查流程
+现在我将开始执行新功能的具体操作...
+```
 
-#### 自我审查清单
-- [ ] 代码遵循项目规范
-- [ ] 错误处理完善
-- [ ] 日志输出清晰
-- [ ] 参数验证严格
-- [ ] 文档更新完整
+#### 状态检查命令模板
+```markdown
+---
+description: 检查系统状态和进度
+---
 
-#### 提交审查
-```bash
-# 添加文件到Git
-git add .
+# /autopilot-status-check
+检查特定的系统状态。
 
-# 创建提交
-git commit -m "feat: 添加新功能模块
+## 检查内容
+1. **状态文件检查**: 验证JSON文件的完整性
+2. **数据一致性**: 检查文件间的数据一致性
+3. **进度验证**: 确认执行进度的合理性
 
-- 实现新功能的核心逻辑
-- 添加对应的JSON模板
-- 更新API文档
-- 添加完整测试用例
+## 检查结果
+- ✅ 正常: 系统状态良好
+- ⚠️ 警告: 发现轻微问题
+- ❌ 错误: 发现严重问题
 
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
-Co-Authored-By: Claude <noreply@anthropic.com>"
+## 修复建议
+根据检查结果提供具体的修复建议...
+```
 
-# 推送到远程
-git push origin feature/new-feature
+#### 恢复命令模板
+```markdown
+---
+description: 系统恢复和修复
+---
+
+# /autopilot-recovery-advanced
+高级系统恢复功能。
+
+## 恢复模式
+- `check`: 仅检查状态，不修复
+- `auto-fix`: 自动修复可恢复的问题
+- `interactive`: 交互式恢复
+
+## 恢复流程
+1. **问题检测**: 扫描状态文件和系统状态
+2. **问题分析**: 分析问题的类型和严重程度
+3. **恢复策略**: 选择合适的恢复方法
+4. **执行恢复**: 实施恢复操作
+5. **验证结果**: 确认恢复是否成功
+
+开始执行系统恢复检查...
 ```
 
 ---
 
-## 📝 代码规范
+## 📋 JSON状态文件设计
 
-### Bash脚本规范
+### 设计原则
 
-#### 1. 脚本头部
-```bash
-#!/bin/bash
-# Claude Code AutoPilot - 脚本描述
-# 详细的功能说明
-
-set -euo pipefail
-```
-
-#### 2. 变量命名
-```bash
-# 全局常量（大写）
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly PROJECT_ROOT="$(realpath "$SCRIPT_DIR/..")"
-
-# 局部变量（小写）
-local todo_id="$1"
-local status="$2"
-```
-
-#### 3. 函数定义
-```bash
-# 函数命名：动词_名词
-function_name() {
-    local param1="$1"
-    local param2="${2:-default_value}"
-
-    # 函数实现
-    log "执行函数: $param1, $param2"
-    return 0
-}
-
-# 简化语法
-another_function() {
-    echo "简化的函数定义"
-}
-```
-
-#### 4. 日志输出
-```bash
-# 统一的日志函数
-log() {
-    echo -e "${GREEN}[$(date '+%Y-%m-%d %H:%M:%S')] SCRIPT_NAME: $1${NC}"
-}
-
-info() {
-    echo -e "${BLUE}[$(date '+%Y-%m-%d %H:%M:%S')] SCRIPT_NAME: $1${NC}"
-}
-
-warn() {
-    echo -e "${YELLOW}[$(date '+%Y-%m-%d %H:%M:%S')] SCRIPT_NAME: WARNING: $1${NC}"
-}
-
-error() {
-    echo -e "${RED}[$(date '+%Y-%m-%d %H:%M:%S')] SCRIPT_NAME: ERROR: $1${NC}"
-}
-```
-
-#### 5. 错误处理
-```bash
-# 参数验证
-if [ -z "$param1" ]; then
-    error "参数不能为空"
-    return 1
-fi
-
-# 文件存在检查
-if [ ! -f "$file_path" ]; then
-    error "文件不存在: $file_path"
-    return 1
-fi
-
-# JSON格式验证
-if ! jq empty "$json_file" 2>/dev/null; then
-    error "JSON格式错误: $json_file"
-    return 1
-fi
-```
-
-### JSON文件规范
-
-#### 1. 基本结构
+#### 1. 数据结构规范
 ```json
 {
   "component_name": {
     "session_id": "PREFIX_YYYYMMDD_HHMMSS_PID",
     "generated_at": "2025-10-17T10:30:00+08:00",
-    "last_update_time": "2025-10-17T10:30:00+08:00"
+    "last_update_time": "2025-10-17T10:30:00+08:00",
+    "其他字段": "..."
   }
 }
 ```
 
-#### 2. 字段命名
-- 使用下划线命名法
+#### 2. 字段命名规范
+- 使用下划线命名法 (`snake_case`)
 - 时间戳使用ISO 8601格式
-- ID字段包含时间戳和进程ID
+- ID字段包含时间戳和进程信息
+- 布尔值使用 `true/false`
 
-#### 3. 数组规范
+#### 3. 数组设计规范
 ```json
 {
   "items": [
     {
       "id": "ITEM_001",
       "name": "项目名称",
-      "status": "active"
+      "status": "active/inactive/completed",
+      "created_at": "2025-10-17T10:30:00+08:00",
+      "updated_at": "2025-10-17T10:30:00+08:00"
     }
   ]
 }
 ```
 
-### Markdown文档规范
+### 状态文件类型
 
-#### 1. 命令文档
-```markdown
-# /command-name
-命令简要描述
+#### 1. 配置类文件
+存储系统配置和用户偏好：
+- `REQUIREMENT_ALIGNMENT.json`: 需求对齐配置
+- `EXECUTION_PLAN.json`: 执行计划配置
 
-## 功能说明
-详细的功能描述...
+#### 2. 状态类文件
+存储动态状态和进度信息：
+- `TODO_TRACKER.json`: 任务进度跟踪
+- `DECISION_LOG.json`: 决策日志记录
+- `EXECUTION_STATE.json`: 执行状态管理
 
-## 用法
-命令的使用方法...
+### 文件操作最佳实践
 
-## 参数
-参数说明...
+#### 读取操作
+1. **文件存在检查**: 确认文件存在
+2. **格式验证**: 验证JSON格式正确性
+3. **数据完整性**: 检查必要字段
+4. **一致性验证**: 与其他文件数据一致性
 
-## 示例
-使用示例...
-```
-
-#### 2. API文档
-```markdown
-# 功能名称 API
-
-## 概述
-API的总体介绍...
-
-## 端点
-### 端点名称
-- **方法**: GET/POST/PUT/DELETE
-- **路径**: `/api/endpoint`
-- **描述**: 端点功能描述
-
-## 请求格式
-```json
-{
-  "field": "value"
-}
-```
-
-## 响应格式
-```json
-{
-  "success": true,
-  "data": {}
-}
-```
-```
+#### 写入操作
+1. **备份创建**: 修改前创建备份
+2. **数据验证**: 验证新数据的正确性
+3. **原子写入**: 使用临时文件确保原子性
+4. **一致性更新**: 同时更新相关文件
 
 ---
 
@@ -400,107 +373,71 @@ API的总体介绍...
 
 ### 测试策略
 
-#### 1. 单元测试
-- 语法检查
-- 函数测试
-- 边界条件测试
+#### 1. 功能测试
+- **命令功能**: 验证每个命令的基本功能
+- **参数处理**: 测试各种参数组合
+- **错误处理**: 验证异常情况的处理
+- **用户交互**: 测试用户界面和交互流程
 
 #### 2. 集成测试
-- 组件间协作测试
-- 端到端流程测试
-- 错误恢复测试
+- **命令协作**: 测试命令间的协作
+- **状态一致性**: 验证状态文件的一致性
+- **工作流程**: 测试完整的执行流程
+- **异常恢复**: 测试异常情况下的恢复
 
-#### 3. 性能测试
-- 大数据量处理测试
-- 并发执行测试
-- 资源使用测试
+#### 3. 用户体验测试
+- **易用性**: 验证命令的易用性
+- **文档准确性**: 确保文档与实际功能一致
+- **错误信息**: 验证错误信息的清晰度
+- **响应时间**: 测试响应时间的合理性
 
-### 测试脚本模板
+### 测试方法
 
-#### 功能测试模板
+#### 手动测试
 ```bash
-#!/bin/bash
-# 功能测试模板
+# 基本功能测试
+claude --dangerously-skip-permissions
+/autopilot-status
+/autopilot-align
+/autopilot-recovery --check
 
-set -euo pipefail
-
-# 测试配置
-readonly TEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly PROJECT_ROOT="$(realpath "$TEST_DIR/..")"
-
-# 测试辅助函数
-test_passed() {
-    echo "✅ PASS: $1"
-}
-
-test_failed() {
-    echo "❌ FAIL: $1"
-    exit 1
-}
-
-# 测试用例
-test_function() {
-    local test_name="$1"
-
-    echo "测试: $test_name"
-
-    # 执行测试逻辑
-    if command_under_test; then
-        test_passed "$test_name"
-    else
-        test_failed "$test_name"
-    fi
-}
-
-# 主测试函数
-main() {
-    echo "开始功能测试..."
-
-    cd "$PROJECT_ROOT"
-
-    # 运行测试用例
-    test_function "初始化测试"
-    test_function "状态管理测试"
-    test_function "监控测试"
-
-    echo "所有测试通过！"
-}
-
-# 脚本入口
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    main "$@"
-fi
+# 错误场景测试
+# 删除部分状态文件，测试恢复功能
+# 修改JSON格式，测试错误处理
 ```
 
-### 自动化测试
+#### 自动化测试
+```bash
+# 创建测试脚本
+tests/test_commands.sh
 
-#### CI/CD集成
-```yaml
-# .github/workflows/test.yml
-name: 测试
-on: [push, pull_request]
+# 测试JSON文件格式
+tests/test_json_format.sh
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: 安装依赖
-      run: |
-        sudo apt-get update
-        sudo apt-get install jq shellcheck
-
-    - name: 语法检查
-      run: |
-        shellcheck scripts/*.sh
-
-    - name: 功能测试
-      run: |
-        ./test-plugin.sh
-        ./tests/integration/full-workflow-test.sh
+# 测试命令集成
+tests/test_integration.sh
 ```
+
+### 测试检查清单
+
+#### 功能测试清单
+- [ ] 所有基本命令正常工作
+- [ ] 参数处理正确
+- [ ] 错误处理完善
+- [ ] 状态文件操作正确
+- [ ] 用户交互友好
+
+#### 集成测试清单
+- [ ] 命令间协作正常
+- [ ] 状态文件一致性
+- [ ] 完整工作流程可用
+- [ ] 异常恢复机制有效
+
+#### 文档测试清单
+- [ ] 命令文档准确
+- [ ] 示例可重现
+- [ ] API文档完整
+- [ ] 用户指南清晰
 
 ---
 
@@ -520,7 +457,7 @@ jobs:
 - [ ] 文档更新完整
 - [ ] 版本号更新
 - [ ] CHANGELOG更新
-- [ ] 安全扫描通过
+- [ ] 示例验证通过
 
 ### 发布步骤
 
@@ -533,30 +470,39 @@ sed -i 's/"version": ".*"/"version": "1.0.1"/' .claude-plugin/plugin.json
 vim CHANGELOG.md
 
 # 运行完整测试
-./test-plugin.sh
+# 手动测试所有命令功能
 ```
 
-#### 2. 创建发布标签
+#### 2. 功能验证
+```bash
+# 验证安装流程
+bash install.sh
+
+# 验证命令功能
+claude --dangerously-skip-permissions
+/autopilot-status
+/autopilot-align
+```
+
+#### 3. 创建发布
 ```bash
 # 提交更改
 git add .
 git commit -m "release: v1.0.1
 
+- 更新命令功能
+- 完善文档内容
+- 修复已知问题
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+Co-Authored-By: Claude <noreply@anthropic.com>"
+
 # 创建标签
 git tag -a v1.0.1 -m "Release version 1.0.1"
 
-# 推送标签
+# 推送更改
+git push origin main
 git push origin v1.0.1
-```
-
-#### 3. 发布验证
-```bash
-# 验证安装流程
-./install.sh
-
-# 验证功能完整性
-./scripts/init-session.sh status
-./scripts/state-manager.sh status
 ```
 
 ---
@@ -565,82 +511,84 @@ git push origin v1.0.1
 
 ### 常见问题
 
-#### 1. 权限问题
+#### 1. 插件加载失败
 ```bash
-# 错误: Permission denied
+# 问题: 命令不可用
 # 解决方案:
-chmod +x scripts/*.sh
+1. 检查 .claude-plugin/plugin.json 格式
+2. 确认 commands/ 目录存在
+3. 验证命令文件格式正确
 ```
 
-#### 2. 依赖缺失
+#### 2. JSON文件格式错误
 ```bash
-# 错误: command not found: jq
+# 问题: JSON解析失败
 # 解决方案:
-sudo apt-get install jq
+1. 使用JSON验证工具检查格式
+2. 检查括号、引号、逗号
+3. 验证字段名称正确性
 ```
 
-#### 3. JSON格式错误
+#### 3. 状态文件不一致
 ```bash
-# 错误: parse error
+# 问题: 状态文件数据冲突
 # 解决方案:
-jq empty broken_file.json
+1. 使用 /autopilot-recovery 检查
+2. 从备份恢复数据
+3. 重新初始化状态文件
 ```
 
-#### 4. 状态文件冲突
+#### 4. 命令执行异常
 ```bash
-# 错误: 状态文件已存在
+# 问题: 命令执行失败
 # 解决方案:
-./scripts/init-session.sh clean
-./scripts/init-session.sh init
+1. 检查命令文件格式
+2. 验证YAML前置元数据
+3. 确认Markdown内容正确
 ```
 
 ### 调试技巧
 
-#### 1. 启用调试模式
+#### 1. 命令调试
 ```bash
-# 在脚本中添加调试信息
-set -x  # 启用命令跟踪
+# 检查命令是否正确加载
+/help | grep autopilot
 
-# 或使用调试函数
-debug() {
-    echo "DEBUG: $1"
-}
+# 测试命令基本功能
+/autopilot-status --quick
 ```
 
-#### 2. 查看详细日志
+#### 2. 状态文件调试
 ```bash
-# 查看运行日志
-tail -f autopilot-logs/*.log
-
-# 查看错误日志
-grep -r "ERROR" autopilot-logs/
-```
-
-#### 3. 验证JSON文件
-```bash
-# 验证JSON格式
+# 检查JSON文件格式
 for file in *.json; do
     echo "检查 $file..."
-    jq empty "$file" || echo "$file 格式错误"
+    python3 -m json.tool "$file" > /dev/null || echo "$file 格式错误"
 done
+```
+
+#### 3. 日志查看
+```bash
+# 查看Claude Code日志
+# 检查命令执行过程中的输出信息
 ```
 
 ### 性能优化
 
-#### 1. 脚本性能
-- 避免不必要的子进程调用
-- 使用内置命令替代外部工具
-- 优化循环和字符串操作
+#### 1. 命令响应优化
+- 简化命令逻辑，减少不必要的处理
+- 优化JSON文件读取操作
+- 提供快速模式选项
 
-#### 2. JSON处理
-- 减少大文件的频繁解析
-- 使用流式处理大数据
-- 合理使用缓存
+#### 2. 状态文件优化
+- 定期清理过期的状态数据
+- 优化JSON结构，减少嵌套层级
+- 合理使用索引和引用
 
-#### 3. 文件I/O
-- 批量操作代替单个操作
-- 减少不必要的文件读写
-- 使用临时文件优化复杂操作
+#### 3. 用户体验优化
+- 提供进度指示
+- 优化错误信息的可读性
+- 增加操作确认机制
 
 ---
 
@@ -650,16 +598,35 @@ done
 - [API参考文档](./API-REFERENCE.md)
 - [用户使用指南](./USER-GUIDE.md)
 - [项目README](../README.md)
+- [Claude Code官方文档](https://docs.claude.com/claude-code)
 
-### 外部资源
-- [Bash脚本最佳实践](https://google.github.io/styleguide/shellguide.html)
-- [ShellCheck文档](https://www.shellcheck.net/)
+### 开发资源
+- [Markdown语法指南](https://www.markdownguide.org/)
 - [JSON规范](https://json.org/)
+- [YAML前置元数据](https://jekyllrb.com/docs/front-matter/)
 
 ### 社区资源
-- [Claude Code官方文档](https://docs.claude.com/claude-code)
 - [GitHub Issues](https://github.com/x-rush/claude-code-autopilot/issues)
 - [讨论区](https://github.com/x-rush/claude-code-autopilot/discussions)
+- [Claude Code社区](https://community.anthropic.com)
+
+---
+
+## 🤝 贡献指南
+
+### 贡献类型
+- **功能增强**: 添加新的slash命令
+- **文档改进**: 完善文档和示例
+- **Bug修复**: 修复已知问题
+- **用户体验**: 改进交互和反馈
+
+### 贡献流程
+1. **Fork项目**: 创建项目分支
+2. **开发功能**: 按照开发指南实现
+3. **测试验证**: 确保功能正常
+4. **提交PR**: 创建Pull Request
+5. **代码审查**: 等待维护者审查
+6. **合并发布**: 合并到主分支
 
 ---
 

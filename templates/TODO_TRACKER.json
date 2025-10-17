@@ -1,0 +1,45 @@
+{
+  "_comment": "TODO_TRACKER.json 结构定义文件 - 专注于进度追踪核心目的",
+  "_purpose": "定义任务进度跟踪的核心数据结构，Claude Code基于此生成运行时文件",
+  "_usage": "Claude Code读取此结构，在执行过程中动态更新任务进度和状态信息",
+
+  "todo_tracker": {
+    "session_id": "TRACK_[YYYYMMDD_HHMMSS]",
+    "plan_id": "PLAN_[执行计划ID]",
+    "updated_at": "[ISO_TIMESTAMP]",
+
+    "progress": {
+      "total_tasks": 25,
+      "completed_tasks": 0,
+      "in_progress_tasks": 0,
+      "failed_tasks": 0,
+      "progress_percentage": 0
+    },
+
+    "current_task": {
+      "task_id": "TASK_[当前任务ID]",
+      "start_time": "[ISO_TIMESTAMP]",
+      "status": "in_progress|paused|completed|failed"
+    },
+
+    "tasks": [
+      {
+        "task_id": "TASK_[001]",
+        "title": "任务标题",
+        "status": "pending|in_progress|completed|failed",
+        "start_time": "[开始时间]",
+        "end_time": "[结束时间]",
+        "duration_minutes": 0,
+        "quality_score": 0.0,
+        "notes": "执行备注",
+        "acceptance_criteria_met": ["已满足的验收标准"]
+      }
+    ],
+
+    "quality_metrics": {
+      "average_quality_score": 0.0,
+      "tasks_below_threshold": 0,
+      "total_retries": 0
+    }
+  }
+}

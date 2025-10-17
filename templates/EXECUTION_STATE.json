@@ -1,0 +1,37 @@
+{
+  "_comment": "EXECUTION_STATE.json 结构定义文件 - 专注于进度追踪核心目的",
+  "_purpose": "定义执行状态的核心数据结构，Claude Code基于此生成运行时文件",
+  "_usage": "Claude Code读取此结构，在执行过程中动态更新执行状态和会话信息",
+
+  "execution_state": {
+    "session_id": "EXEC_[YYYYMMDD_HHMMSS]",
+    "plan_id": "PLAN_[执行计划ID]",
+    "updated_at": "[ISO_TIMESTAMP]",
+
+    "status": {
+      "execution_status": "running|paused|completed|error",
+      "start_time": "[ISO_TIMESTAMP]",
+      "current_task_id": "TASK_[当前任务ID]",
+      "execution_duration_minutes": 0,
+      "last_activity_time": "[ISO_TIMESTAMP]"
+    },
+
+    "context": {
+      "context_health_score": 10.0,
+      "last_refresh_time": "[ISO_TIMESTAMP]",
+      "next_refresh_recommended": "[ISO_TIMESTAMP]"
+    },
+
+    "system_health": {
+      "all_files_healthy": true,
+      "data_consistency_verified": true,
+      "error_count_last_hour": 0
+    },
+
+    "next_actions": {
+      "next_task_id": "TASK_[下一个任务ID]",
+      "estimated_remaining_time": 30,
+      "recommended_actions": ["建议的行动列表"]
+    }
+  }
+}

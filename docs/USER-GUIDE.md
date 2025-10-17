@@ -49,26 +49,19 @@ claude --dangerously-skip-permissions
 
 ### 系统要求
 
-#### 必需工具
-```bash
-# 检查依赖工具
-for tool in jq awk curl date stat realpath; do
-    if which "$tool" &>/dev/null; then
-        echo "✅ $tool 已安装"
-    else
-        echo "❌ 请先安装 $tool"
-        exit 1
-    fi
-done
-```
+#### 基本要求
+- **Claude Code**: 已安装并正常运行
+- **项目目录**: 任何现有项目目录或空目录
+- **纯插件实现**: 无需额外依赖工具
 
-#### 安装命令
+#### 验证Claude Code
 ```bash
-# Ubuntu/Debian
-sudo apt-get install jq coreutils curl
+# 检查Claude Code版本
+claude --version
 
-# macOS
-brew install jq coreutils curl
+# 测试基本功能
+claude --dangerously-skip-permissions
+/help
 ```
 
 ### 插件安装
@@ -87,7 +80,6 @@ bash /path/to/claude-code-autopilot/install.sh
 
 **安装过程**
 安装脚本会自动：
-- 检查系统依赖（jq, curl等）
 - 在当前项目创建 `.claude/plugins/claude-code-autopilot/` 目录
 - 复制所有必要的插件文件到项目目录
 - Claude Code 启动时自动发现并加载插件
@@ -123,11 +115,12 @@ bash .claude/plugins/claude-code-autopilot/install.sh --help
 
 ### 验证安装
 ```bash
-# 运行测试脚本
-./test-plugin.sh
-
 # 检查插件是否安装成功
-/plugin list | grep autopilot
+claude --dangerously-skip-permissions
+/help | grep autopilot
+
+# 测试基本命令
+/autopilot-status
 ```
 
 ---
@@ -375,11 +368,10 @@ ls -la .claude/
 #### 3. 状态文件损坏
 ```bash
 # 使用恢复命令
-/autopilot-recovery
+/autopilot-recovery --auto-fix
 
 # 或重新初始化
-./scripts/init-session.sh clean
-./scripts/init-session.sh init --force
+/autopilot-recovery --interactive
 ```
 
 #### 4. 执行中断
@@ -405,12 +397,14 @@ grep -r "ERROR" autopilot-logs/
 
 #### 手动状态检查
 ```bash
-# 检查初始化状态
-./scripts/init-session.sh status
+# 检查系统健康状态
+/autopilot-status --aspect health
 
-# 检查系统健康
-./scripts/state-manager.sh check
-./scripts/execution-monitor.sh status
+# 检查进度状态
+/autopilot-status --aspect progress
+
+# 检查质量指标
+/autopilot-status --aspect quality
 ```
 
 ### 性能优化
@@ -538,9 +532,9 @@ find autopilot-logs/ -name "*.log" -mtime +7 -delete
 
 **A**: 可以通过以下方式干预：
 - **查看状态**：使用`/autopilot-status`随时查看进度
-- **手动控制**：使用脚本命令直接管理状态
-- **暂停恢复**：使用`/autopilot-recovery`控制执行流程
-- **调整计划**：编辑状态文件修改执行计划
+- **需求对齐检查**：使用`/autopilot-align`验证执行方向
+- **状态恢复**：使用`/autopilot-recovery`控制执行流程
+- **调整计划**：编辑JSON状态文件修改执行计划
 
 ### Q4: 如何处理长时间执行？
 
@@ -569,10 +563,10 @@ find autopilot-logs/ -name "*.log" -mtime +7 -delete
 ### Q7: 如何扩展AutoPilot功能？
 
 **A**: 可以通过以下方式扩展：
-- **自定义脚本**：在`scripts/`目录添加新功能
 - **扩展命令**：在`commands/`目录添加新的slash命令
 - **修改模板**：在`templates/`目录自定义状态文件结构
-- **调整配置**：修改脚本中的配置参数
+- **自定义JSON结构**：扩展状态文件的数据结构
+- **优化命令逻辑**：改进现有命令的提示词和功能
 
 ### Q8: 执行失败后如何恢复？
 

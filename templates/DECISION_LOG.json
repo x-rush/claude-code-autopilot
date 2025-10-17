@@ -1,0 +1,33 @@
+{
+  "_comment": "DECISION_LOG.json 结构定义文件 - 专注于进度追踪核心目的",
+  "_purpose": "定义决策日志的核心数据结构，Claude Code基于此生成运行时文件",
+  "_usage": "Claude Code读取此结构，在执行过程中记录偏离规划的决策",
+
+  "decision_log": {
+    "session_id": "DEC_[YYYYMMDD_HHMMSS]",
+    "plan_id": "PLAN_[执行计划ID]",
+    "updated_at": "[ISO_TIMESTAMP]",
+
+    "decisions": [
+      {
+        "decision_id": "DEC_[001]",
+        "task_id": "TASK_[关联任务ID]",
+        "timestamp": "[ISO_TIMESTAMP]",
+        "decision_point": "决策点描述",
+        "decision_made": "具体决策内容",
+        "decision_type": "preset|manual|recovery",
+        "reason": "决策理由",
+        "impact_on_progress": "positive|neutral|negative",
+        "alignment_check": "aligned|deviated|conflict"
+      }
+    ],
+
+    "summary": {
+      "total_decisions": 0,
+      "preset_decisions": 0,
+      "manual_decisions": 0,
+      "recovery_decisions": 0,
+      "alignment_deviations": 0
+    }
+  }
+}

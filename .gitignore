@@ -12,12 +12,12 @@ Thumbs.db
 *~
 
 # Claude Code AutoPilot Plugin 运行时产生的文件
-# 插件执行状态文件
-REQUIREMENT_ALIGNMENT.json
-EXECUTION_PLAN.json
-TODO_TRACKER.json
-DECISION_LOG.json
-EXECUTION_STATE.json
+# 插件执行状态文件（仅在根目录下忽略）
+/REQUIREMENT_ALIGNMENT.json
+/EXECUTION_PLAN.json
+/TODO_TRACKER.json
+/DECISION_LOG.json
+/EXECUTION_STATE.json
 
 # 插件运行日志和报告
 *_execution_log.md

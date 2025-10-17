@@ -1,0 +1,36 @@
+{
+  "_comment": "EXECUTION_PLAN.json 结构定义文件 - 专注于进度追踪核心目的",
+  "_purpose": "定义执行计划的核心数据结构，Claude Code基于此生成运行时文件",
+  "_usage": "Claude Code读取此结构，基于需求对齐结果生成实际的执行计划文件",
+
+  "execution_plan": {
+    "session_id": "PLAN_[YYYYMMDD_HHMMSS]",
+    "requirement_id": "REQ_[需求对齐ID]",
+    "created_at": "[ISO_TIMESTAMP]",
+    "estimated_hours": 8,
+    "total_tasks": 25,
+
+    "tasks": [
+      {
+        "task_id": "TASK_[001]",
+        "title": "任务标题",
+        "description": "任务描述",
+        "type": "analysis|design|implementation|testing|documentation",
+        "priority": "high|medium|low",
+        "estimated_minutes": 30,
+        "dependencies": ["前置任务ID"],
+        "acceptance_criteria": ["验收标准列表"],
+        "quality_gate": {
+          "min_score": 8.0,
+          "must_pass_tests": true
+        }
+      }
+    ],
+
+    "execution_strategy": {
+      "quality_checks": "every_task",
+      "auto_recovery": true,
+      "context_refresh": "30_minutes"
+    }
+  }
+}

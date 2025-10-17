@@ -1,0 +1,19 @@
+{
+  "_comment": "REQUIREMENT_ALIGNMENT.json 结构定义文件 - 专注于进度追踪核心目的",
+  "_purpose": "定义需求对齐的核心数据结构，Claude Code基于此生成运行时文件",
+  "_usage": "Claude Code读取此结构，基于用户需求讨论生成实际的需求对齐文件",
+
+  "requirement_alignment": {
+    "session_id": "REQ_[YYYYMMDD_HHMMSS]",
+    "user_task": "用户原始任务描述",
+    "core_objectives": ["核心目标列表"],
+    "success_criteria": ["成功标准列表"],
+    "quality_standards": {
+      "min_quality_score": 8.0,
+      "must_have_tests": true,
+      "documentation_required": true
+    },
+    "technical_constraints": ["技术约束列表"],
+    "confirmation_time": "[ISO_TIMESTAMP]"
+  }
+}
