@@ -22,7 +22,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Key Commands
 
 ### Primary Workflow Commands
-- `/autopilot-continuous-start` - Initiates the complete workflow from requirements to autonomous execution
+- `/autopilot-start` - Initiates the complete workflow from requirements to autonomous execution
 - `/autopilot-status` - Shows current execution progress and system health
 - `/autopilot-align` - Validates execution against original requirements
 - `/autopilot-execute` - Executes specific tasks with quality scoring
@@ -51,7 +51,7 @@ claude --dangerously-skip-permissions
 /help | grep autopilot
 
 # Start the workflow
-/autopilot-continuous-start
+/autopilot-start
 ```
 
 ## State File System
@@ -102,7 +102,7 @@ When modifying or debugging the plugin:
 - Test command implementations thoroughly
 
 ### For User Projects
-- Always start with `/autopilot-continuous-start` for new projects
+- Always start with `/autopilot-start` for new projects
 - Monitor progress with `/autopilot-status` regularly
 - Use `/autopilot-align` to verify requirement alignment
 - Leverage `/autopilot-recovery` for error recovery

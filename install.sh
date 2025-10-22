@@ -53,7 +53,7 @@ show_help() {
     echo ""
     echo "安装后使用:"
     echo "  1. 启动Claude Code: claude --dangerously-skip-permissions"
-    echo "  2. 开始使用: /autopilot-continuous-start"
+    echo "  2. 开始使用: /autopilot-start"
 }
 
 # 显示版本信息
@@ -106,7 +106,7 @@ validate_plugin_source() {
 
     # 检查必需的文件
     check_file "$plugin_source_dir/.claude-plugin/plugin.json" "插件配置"
-    check_file "$plugin_source_dir/commands/autopilot-continuous-start.md" "主命令"
+    check_file "$plugin_source_dir/commands/autopilot-start.md" "主命令"
 
     # 验证命令文件数量
     local command_count=$(find "$plugin_source_dir/commands" -name "*.md" | wc -l)
@@ -201,7 +201,7 @@ EOF
     echo ""
     echo "现在可以使用AutoPilot插件："
     echo "  1. 启动Claude Code: claude --dangerously-skip-permissions"
-    echo "  2. 开始使用: /autopilot-continuous-start"
+    echo "  2. 开始使用: /autopilot-start"
     echo ""
     echo "管理插件："
     echo "  - 查看状态: $plugin_dir/manage.sh status"
@@ -231,7 +231,7 @@ show_status() {
         # 检查核心文件
         local required_files=(
             ".claude-plugin/plugin.json"
-            "commands/autopilot-continuous-start.md"
+            "commands/autopilot-start.md"
             "templates/REQUIREMENT_ALIGNMENT.json"
         )
 
@@ -251,7 +251,7 @@ show_status() {
             echo ""
             echo "建议下一步:"
             echo "  1. 启动Claude Code: claude --dangerously-skip-permissions"
-            echo "  2. 开始使用: /autopilot-continuous-start"
+            echo "  2. 开始使用: /autopilot-start"
         else
             echo ""
             echo "⚠️  插件完整性: ❌ 有问题"

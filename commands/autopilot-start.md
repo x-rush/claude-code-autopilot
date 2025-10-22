@@ -2,13 +2,13 @@
 description: 启动完整的AutoPilot工作流程 - 从需求讨论到自主执行
 ---
 
-# /autopilot-continuous-start
+# /autopilot-start
 启动AutoPilot完整工作流程：需求讨论 → 规划生成 → 自主执行。
 
 ## 使用方法
 ```bash
-/autopilot-continuous-start           # 启动完整工作流
-/autopilot-continuous-start --quick   # 快速启动模式
+/autopilot-start           # 启动完整工作流
+/autopilot-start --quick   # 快速启动模式
 ```
 
 ## 工作流程阶段

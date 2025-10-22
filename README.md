@@ -97,7 +97,7 @@ claude --dangerously-skip-permissions
 
 #### 启动连续执行流程
 ```
-/autopilot-continuous-start
+/autopilot-start
 ```
 
 ### 3. 三阶段执行流程
@@ -214,7 +214,7 @@ claude-code-autopilot/
 ├── .claude-plugin/
 │   └── plugin.json              # 插件清单文件
 ├── commands/                    # Slash命令目录
-│   ├── autopilot-continuous-start.md    # 启动完整工作流程
+│   ├── autopilot-start.md    # 启动完整工作流程
 │   ├── autopilot-plan.md               # 执行计划生成
 │   ├── autopilot-align.md               # 需求对齐生成
 │   ├── autopilot-execute.md             # 自主执行管理
@@ -246,7 +246,7 @@ claude-code-autopilot/
 
 **纯插件工作流程**：
 1. 用户下载插件代码（包含templates/结构定义文件）
-2. 运行 `/autopilot-continuous-start` 开始工作流程
+2. 运行 `/autopilot-start` 开始工作流程
 3. Claude Code读取templates/中的结构定义文件
 4. 基于用户需求讨论**动态生成**项目特定的运行时JSON文件
 5. 运行时文件保存在项目根目录，被.gitignore忽略
@@ -426,7 +426,7 @@ bash /path/to/claude-code-autopilot/install.sh
 claude --dangerously-skip-permissions
 
 # 3. 开始AutoPilot
-/autopilot-continuous-start
+/autopilot-start
 ```
 
 让Claude Code AutoPilot为你实现真正的24小时无人值守项目执行！
