@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Pure Plugin Design
 - **Zero External Dependencies**: Only relies on Claude Code and basic shell commands
-- **Project-Level Installation**: Each project manages its own plugin instance
+- **Global Marketplace Installation**: Installation through local marketplace following official standards
 - **Slash Command Driven**: All functionality through standard slash commands
 - **JSON State Management**: Five core state files track the entire project lifecycle
 
@@ -32,17 +32,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Installation and Setup
 
-### Project Installation
+### Global Installation
 ```bash
 # Clone the repository (one time)
 git clone https://github.com/x-rush/claude-code-autopilot.git
 
-# Install in any project
-cd your-project
-bash /path/to/claude-code-autopilot/install.sh
-
-# Start Claude Code with the plugin
+# Start Claude Code
 claude --dangerously-skip-permissions
+
+# Add the plugin directory as a marketplace
+/plugin marketplace add /path/to/claude-code-autopilot
+
+# Install the plugin
+/plugin install claude-code-autopilot@claude-code-autopilot
+```
+
+### Example Installation
+```bash
+# Example with absolute path
+/plugin marketplace add ~/dev/claude-code-autopilot
+/plugin install claude-code-autopilot@claude-code-autopilot
 ```
 
 ### Verification
@@ -141,7 +150,7 @@ When modifying or debugging the plugin:
 ### Git Integration
 - Template files in `templates/` are versioned
 - Runtime state files in project root are git-ignored
-- Plugin installation files in `.claude/plugins/` can be versioned with project
+- Local marketplace files in `local-marketplace/` can be versioned with project
 
 ### File Operations
 - All file operations are limited to the project directory
@@ -171,10 +180,11 @@ When extending the plugin:
 ## Key Design Principles
 
 1. **Zero Dependency**: Pure Claude Code capability utilization
-2. **Project Autonomy**: Each project manages its own instance
-3. **Workflow Constraint**: Strict three-phase execution model
-4. **State Persistence**: Complete execution tracking through JSON files
-5. **Continuous Alignment**: Ongoing verification with original requirements
-6. **Autonomous Recovery**: Intelligent error detection and recovery
+2. **Official Standards Compliance**: Installation through local marketplace mechanism
+3. **Project Autonomy**: Each project manages its own instance and marketplace
+4. **Workflow Constraint**: Strict three-phase execution model
+5. **State Persistence**: Complete execution tracking through JSON files
+6. **Continuous Alignment**: Ongoing verification with original requirements
+7. **Autonomous Recovery**: Intelligent error detection and recovery
 
 This plugin represents a sophisticated approach to autonomous project execution that maintains strict alignment with user requirements while providing complete transparency and control through its comprehensive state management system.

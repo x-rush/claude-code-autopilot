@@ -7,10 +7,7 @@
     "email": "autopilot@claude-code.com"
   },
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/x-rush/claude-code-autopilot.git"
-  },
+  "repository": "https://github.com/x-rush/claude-code-autopilot.git",
   "keywords": [
     "claude-code",
     "autopilot",
@@ -18,22 +15,5 @@
     "workflow",
     "continuous-execution",
     "无人值守"
-  ],
-  "category": "Workflow Automation",
-  "capabilities": [
-    "deep-requirement-analysis",
-    "autonomous-execution",
-    "intelligent-retry",
-    "progress-tracking",
-    "quality-assurance",
-    "context-management"
-  ],
-  "claude_code_version": ">=1.0.0",
-  "supported_environments": ["terminal", "ide"],
-  "safety_features": {
-    "project_directory_restriction": true,
-    "dangerous_operation_prevention": true,
-    "automatic_recovery": true,
-    "progress_logging": true
-  }
+  ]
 }
