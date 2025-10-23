@@ -1,0 +1,68 @@
+{
+  "_comment": "软件开发项目执行计划示例",
+  "execution_plan": {
+    "session_id": "PLAN_20251023_144500",
+    "requirement_id": "REQ_20251023_143022",
+    "created_at": "2025-10-23T14:45:00Z",
+    "estimated_hours": 32,
+    "total_tasks": 12,
+
+    "tasks": [
+      {
+        "task_id": "TASK_001",
+        "title": "项目环境搭建和基础架构",
+        "description": "初始化项目、设置开发环境、建立基础代码结构",
+        "type": "setup",
+        "priority": "high",
+        "estimated_minutes": 120,
+        "dependencies": [],
+        "acceptance_criteria": [
+          "开发环境可正常运行",
+          "代码仓库结构清晰",
+          "基础依赖安装完成",
+          "开发工具配置正确"
+        ],
+        "quality_gate": {
+          "min_score": 8.0,
+          "must_pass_tests": false
+        }
+      },
+      {
+        "task_id": "TASK_002",
+        "title": "数据库设计和模型定义",
+        "description": "设计数据库表结构、定义数据模型、建立数据关系",
+        "type": "design",
+        "priority": "high",
+        "estimated_minutes": 90,
+        "dependencies": ["TASK_001"],
+        "acceptance_criteria": [
+          "数据库ER图设计完成",
+          "表结构定义清晰",
+          "数据关系合理",
+          "索引策略制定"
+        ],
+        "quality_gate": {
+          "min_score": 8.5,
+          "must_pass_tests": false
+        }
+      }
+    ],
+
+    "execution_strategy": {
+      "quality_checks": "every_task",
+      "auto_recovery": true,
+      "context_refresh": "30_minutes",
+      "parallel_tasks": 2,
+      "risk_mitigation": "proactive"
+    },
+
+    "milestones": [
+      {
+        "milestone_id": "M1",
+        "name": "基础架构完成",
+        "target_tasks": ["TASK_001", "TASK_002"],
+        "estimated_completion": "2025-10-24T18:00:00Z"
+      }
+    ]
+  }
+}

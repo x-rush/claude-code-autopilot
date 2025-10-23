@@ -1,0 +1,42 @@
+{
+  "_comment": "典型需求对齐示例 - Web应用开发项目",
+  "requirement_alignment": {
+    "session_id": "REQ_20251023_143022",
+    "user_task": "开发一个在线任务管理Web应用，支持用户注册登录、任务CRUD操作、分类管理和进度跟踪",
+    "core_objectives": [
+      "用户认证系统（注册、登录、会话管理）",
+      "任务管理功能（创建、读取、更新、删除）",
+      "任务分类和标签系统",
+      "进度跟踪和可视化展示",
+      "响应式Web界面设计"
+    ],
+    "success_criteria": [
+      "用户可以在3分钟内完成注册并开始使用",
+      "任务操作响应时间 < 200ms",
+      "支持移动端和桌面端访问",
+      "数据持久化和备份机制完善",
+      "系统可用性 ≥ 99.5%"
+    ],
+    "quality_standards": {
+      "min_quality_score": 8.5,
+      "must_have_tests": true,
+      "test_coverage_min": 85,
+      "documentation_required": true,
+      "code_style_check": true
+    },
+    "technical_constraints": [
+      "使用现代Web技术栈（React/Vue + Node.js）",
+      "数据库使用PostgreSQL或MongoDB",
+      "部署到云平台（AWS/阿里云）",
+      "遵循RESTful API设计原则",
+      "实现基本的安全防护措施"
+    ],
+    "user_preferences": {
+      "development_approach": "敏捷迭代，优先核心功能",
+      "risk_tolerance": "medium",
+      "communication_style": "详细解释技术决策",
+      "documentation_level": "comprehensive"
+    },
+    "confirmation_time": "2025-10-23T14:30:22Z"
+  }
+}

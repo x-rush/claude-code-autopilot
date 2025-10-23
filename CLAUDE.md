@@ -19,16 +19,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 2. **Execution Plan Generation**: Dynamic task decomposition and state file creation
 3. **Autonomous Execution**: Continuous task execution with real-time status updates
 
-## Key Commands
+## Key Commands (Simplified to 4 Core Commands)
 
 ### Primary Workflow Commands
 - `/autopilot-start` - Initiates the complete workflow from requirements to autonomous execution
-- `/autopilot-status` - Shows current execution progress and system health
-- `/autopilot-align` - Validates execution against original requirements
-- `/autopilot-execute` - Executes specific tasks with quality scoring
-- `/autopilot-context-refresh` - Handles context limitations automatically
-- `/autopilot-recovery` - Handles abnormal execution states
-- `/autopilot-plan` - Generates execution plans
+- `/autopilot-status` - Shows current execution progress, alignment, and system health
+- `/autopilot-continue` - Intelligent task execution with automatic recovery and context management
+- `/autopilot-help` - Displays usage guidance and troubleshooting information
+
+### Command Features
+- **Simplified Design**: Only 4 commands to remember, reducing cognitive load
+- **Intelligent Automation**: Automatic state detection, recovery, and context management
+- **Unified Functionality**: Each command combines multiple related capabilities
+- **Professional Agents**: Automatically activates appropriate expert agents based on task needs
 
 ## Installation and Setup
 
@@ -75,19 +78,30 @@ The plugin uses five state files that are generated dynamically based on templat
 5. **EXECUTION_STATE.json** - Current execution status and session information
 
 ### Template vs Runtime Files
-- `templates/*.json` - Structure definitions that Claude Code reads to understand data formats
+- `skills/*/templates/*.json` - Structure definitions accessed via @-file references
+- `skills/*/examples/*.json` - Usage examples accessed via @-file references
 - Project root `*.json` - Runtime-generated project-specific state files (git-ignored)
 
 ## Development Workflow
 
 ### Understanding the Plugin Structure
 ```
-.claude/plugins/claude-code-autopilot/
+claude-code-autopilot/
 ├── .claude-plugin/plugin.json      # Plugin metadata
-├── commands/                       # Slash command implementations
-├── templates/                      # JSON structure definitions
-├── docs/                          # Documentation
-└── manage.sh                     # Plugin management script
+├── commands/                       # 4 simplified slash commands
+│   ├── autopilot-start.md         # Unified entry point
+│   ├── autopilot-status.md        # Multi-functional status
+│   ├── autopilot-continue.md      # Intelligent execution
+│   └── autopilot-help.md          # Help and guidance
+├── agents/                         # Professional expert agents
+│   ├── requirement-analyst.md     # Requirements analysis
+│   ├── execution-planner.md       # Task planning
+│   └── quality-assurance.md       # Quality control
+├── skills/                         # Modular skill systems
+│   ├── requirement-alignment/     # Requirements skill
+│   ├── execution-planning/        # Planning skill
+│   └── state-management/          # State management skill
+└── docs/                          # Documentation
 ```
 
 ### Working with State Files
@@ -113,8 +127,8 @@ When modifying or debugging the plugin:
 ### For User Projects
 - Always start with `/autopilot-start` for new projects
 - Monitor progress with `/autopilot-status` regularly
-- Use `/autopilot-align` to verify requirement alignment
-- Leverage `/autopilot-recovery` for error recovery
+- Use `/autopilot-status --alignment` to verify requirement alignment
+- Use `/autopilot-continue --recover` for error recovery
 
 ### Safety and Security
 - Operations are restricted to the current project directory
@@ -126,8 +140,8 @@ When modifying or debugging the plugin:
 
 ### Common Issues
 - **Plugin Loading**: Verify installation with `/help | grep autopilot`
-- **State File Issues**: Use `/autopilot-recovery --auto-fix` for automatic repairs
-- **Context Limits**: Use `/autopilot-context-refresh` manually when needed
+- **State File Issues**: Use `/autopilot-continue --recover` for automatic repairs
+- **Context Limits**: Use `/autopilot-continue --refresh` for automatic context management
 - **Execution Interruption**: Check status with `/autopilot-status` and recover as needed
 
 ### Debug Commands

@@ -1,53 +1,45 @@
 ---
-description: 查看AutoPilot执行状态和进度报告
+description: 查看AutoPilot状态 - 多功能状态命令，包含进度、质量、需求对齐等所有检查
+allowed-tools: Read, Bash
 ---
 
 # /autopilot-status
-查看实时执行状态、进度报告和系统健康状况。
+查看实时执行状态、进度报告、需求对齐状况和系统健康状况。
 
 ## 使用方法
 ```bash
 /autopilot-status                    # 完整状态报告
 /autopilot-status --quick           # 快速概览
-/autopilot-status --aspect <类型>    # 指定方面检查
+/autopilot-status --progress        # 仅显示任务进度
+/autopilot-status --alignment       # 仅检查需求对齐状态
+/autopilot-status --quality         # 仅显示质量指标
 ```
-
-## 检查方面
-- `alignment` - 需求对齐状态
-- `progress` - 任务执行进度
-- `quality` - 质量指标状况
-- `health` - 系统健康状态
-- `decisions` - 决策记录分析
-
-## 状态内容
-### 执行概览
-- 会话信息和执行时长
-- 当前状态和进度百分比
-- 整体健康评分
-
-### 任务进度
-- 总任务数和完成情况
-- 当前任务和下一步计划
-- 质量评分趋势
-
-### 系统健康
-- 状态文件完整性
-- 数据一致性检查
-- 上下文健康度
 
 ## 使用场景
 - 定期检查执行进度
 - 评估项目健康状况
-- 分析执行效率
-- 验证需求对齐
+- 验证需求对齐状况
+- 诊断执行异常问题
 
 ## 相关命令
-- `/autopilot-align` - 需求对齐检查
-- `/autopilot-recovery` - 异常恢复
-- `/autopilot-execute` - 继续执行
+- `/autopilot-continue` - 继续执行任务
+- `/autopilot-start` - 重新启动工作流
+- `/autopilot-help` - 显示帮助信息
 
 ---
 
 现在开始执行状态检查，生成详细报告。
 
-详细说明请参考：[工作流程文档](../docs/workflow.md)
+**状态文件检查**
+!`ls -la *.json 2>/dev/null || echo "No JSON state files found"`
+
+**执行状态分析**
+我将基于以下状态文件结构进行分析：
+- @skills/state-management/templates/TODO_TRACKER.json
+- @skills/state-management/templates/DECISION_LOG.json
+- @skills/state-management/templates/EXECUTION_STATE.json
+
+**健康状态参考**
+@skills/state-management/examples/healthy-state-example.json
+
+**状态报告生成完成**

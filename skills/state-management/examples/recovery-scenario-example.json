@@ -1,0 +1,51 @@
+{
+  "_comment": "恢复场景示例 - 状态文件损坏后的恢复过程",
+  "recovery_scenario": {
+    "scenario_name": "JSON格式损坏恢复",
+    "detected_at": "2025-10-23T16:00:00Z",
+    "recovery_strategy": "auto_fix_from_backup",
+
+    "problem_description": {
+      "damaged_files": ["TODO_TRACKER.json"],
+      "error_type": "JSON_PARSE_ERROR",
+      "error_details": "Unexpected token at line 15",
+      "impact_assessment": "medium"
+    },
+
+    "recovery_steps": [
+      {
+        "step": 1,
+        "action": "backup_detection",
+        "result": "found recent backup at TODO_TRACKER.json.backup"
+      },
+      {
+        "step": 2,
+        "action": "data_validation",
+        "result": "backup data integrity verified"
+      },
+      {
+        "step": 3,
+        "action": "restore_from_backup",
+        "result": "successfully restored primary file"
+      },
+      {
+        "step": 4,
+        "action": "synchronization_check",
+        "result": "all state files now consistent"
+      }
+    ],
+
+    "recovery_result": {
+      "status": "success",
+      "data_loss": "none",
+      "recovery_time_minutes": 5,
+      "files_restored": ["TODO_TRACKER.json"]
+    },
+
+    "preventive_measures": [
+      "Enable automatic backup every 10 minutes",
+      "Add JSON schema validation",
+      "Implement incremental checkpoint system"
+    ]
+  }
+}

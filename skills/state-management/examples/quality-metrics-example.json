@@ -1,0 +1,60 @@
+{
+  "_comment": "质量指标示例 - 完整的质量评估数据",
+  "quality_metrics": {
+    "session_id": "QUALITY_20251023_150000",
+    "evaluation_period": "2025-10-23T14:00:00Z to 2025-10-23T15:30:00Z",
+
+    "overall_quality": {
+      "average_score": 8.7,
+      "quality_trend": "improving",
+      "tasks_evaluated": 6,
+      "high_quality_tasks": 5,
+      "medium_quality_tasks": 1,
+      "low_quality_tasks": 0
+    },
+
+    "quality_dimensions": {
+      "functionality": {
+        "score": 9.2,
+        "weight": 0.4,
+        "notes": "功能实现完整，符合需求规格"
+      },
+      "code_quality": {
+        "score": 8.5,
+        "weight": 0.3,
+        "notes": "代码结构清晰，遵循最佳实践"
+      },
+      "documentation": {
+        "score": 8.0,
+        "weight": 0.2,
+        "notes": "文档基本完整，可进一步优化"
+      },
+      "performance": {
+        "score": 8.8,
+        "weight": 0.1,
+        "notes": "性能表现良好，响应时间达标"
+      }
+    },
+
+    "quality_gates": {
+      "min_acceptable_score": 8.0,
+      "current_score": 8.7,
+      "gate_status": "passed",
+      "critical_issues": 0,
+      "minor_issues": 2
+    },
+
+    "improvement_recommendations": [
+      {
+        "area": "documentation",
+        "priority": "medium",
+        "action": "添加更多使用示例和API文档"
+      },
+      {
+        "area": "code_style",
+        "priority": "low",
+        "action": "统一错误处理模式"
+      }
+    ]
+  }
+}

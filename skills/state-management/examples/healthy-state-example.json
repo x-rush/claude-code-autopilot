@@ -1,0 +1,47 @@
+{
+  "_comment": "健康状态示例 - 完整的项目执行状态",
+  "todo_tracker": {
+    "session_id": "TRACK_20251023_150000",
+    "plan_id": "PLAN_20251023_144500",
+    "updated_at": "2025-10-23T15:30:00Z",
+    "progress": {
+      "total_tasks": 12,
+      "completed_tasks": 5,
+      "in_progress_tasks": 1,
+      "failed_tasks": 0,
+      "progress_percentage": 41.7
+    },
+    "current_task": {
+      "task_id": "TASK_006",
+      "start_time": "2025-10-23T15:00:00Z",
+      "status": "in_progress"
+    },
+    "quality_metrics": {
+      "average_quality_score": 8.8,
+      "tasks_below_threshold": 0,
+      "total_retries": 1
+    }
+  },
+  "execution_state": {
+    "session_id": "EXEC_20251023_150000",
+    "plan_id": "PLAN_20251023_144500",
+    "updated_at": "2025-10-23T15:30:00Z",
+    "status": {
+      "execution_status": "running",
+      "start_time": "2025-10-23T14:00:00Z",
+      "current_task_id": "TASK_006",
+      "execution_duration_minutes": 90,
+      "last_activity_time": "2025-10-23T15:30:00Z"
+    },
+    "context": {
+      "context_health_score": 9.2,
+      "last_refresh_time": "2025-10-23T15:15:00Z",
+      "next_refresh_recommended": "2025-10-23T15:45:00Z"
+    },
+    "system_health": {
+      "all_files_healthy": true,
+      "data_consistency_verified": true,
+      "error_count_last_hour": 0
+    }
+  }
+}

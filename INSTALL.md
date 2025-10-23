@@ -46,14 +46,30 @@ claude --dangerously-skip-permissions
 
 ## 🎯 安装完成后的使用
 
-安装成功后，你可以在任何项目中使用这些命令：
+安装成功后，你可以在任何项目中使用这4个简化命令：
 
+### 核心命令
 - `/autopilot-start` - 启动完整的自主执行工作流
 - `/autopilot-status` - 查看执行进度和状态
-- `/autopilot-align` - 验证执行与需求的一致性
-- `/autopilot-execute` - 执行特定任务
-- `/autopilot-recovery` - 处理异常情况
-- `/autopilot-context-refresh` - 刷新对话上下文
+- `/autopilot-continue` - 智能继续执行任务
+- `/autopilot-help` - 显示使用指南和帮助
+
+### 快速开始
+```bash
+# 1. 启动项目
+/autopilot-start
+
+# 2. 查看状态
+/autopilot-status --quick
+
+# 3. 继续执行
+/autopilot-continue
+
+# 4. 需要帮助
+/autopilot-help
+```
+
+**特点**：极简设计，只需记住4个命令，大幅降低学习成本！
 
 ## 🔧 卸载插件
 

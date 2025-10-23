@@ -1,72 +1,62 @@
 # AutoPilot 命令快速参考
 
-## 核心命令
+## 四个核心命令
 
 | 命令 | 功能 | 常用选项 | 快速说明 |
 |------|------|----------|----------|
-| `/autopilot-start` | 启动完整工作流 | `--quick` | 需求讨论→规划→执行 |
-| `/autopilot-status` | 查看执行状态 | `--quick`, `--aspect <type>` | 进度、质量、健康状态 |
-| `/autopilot-execute` | 继续执行任务 | `--recover`, `--skip <ID>` | 按计划执行下一任务 |
-| `/autopilot-align` | 需求对齐检查 | `--update`, `--verify` | 验证与需求的一致性 |
-| `/autopilot-recovery` | 异常状态恢复 | `--check`, `--fix`, `--reinit` | 检测和修复执行异常 |
-| `/autopilot-context-refresh` | 刷新对话上下文 | `--quick`, `--summary-only` | 重建执行环境连续性 |
-| `/autopilot-plan` | 生成执行计划 | `--update`, `--validate` | 基于需求制定任务计划 |
+| `/autopilot-start` | 启动工作流 | `--quick` | 需求讨论→规划→初始化 |
+| `/autopilot-status` | 查看状态 | `--quick`, `--progress`, `--alignment`, `--quality` | 进度、质量、需求对齐 |
+| `/autopilot-continue` | 继续执行 | `--recover`, `--refresh`, `--skip <ID>` | 智能执行+自动恢复 |
+| `/autopilot-help` | 显示帮助 | `--quick`, `--trouble` | 使用指南+故障排除 |
 
-## 典型使用流程
+## 简化的使用流程
 
 ### 新项目启动
 ```bash
-/autopilot-start          # 启动完整工作流
+/autopilot-start          # 一键启动，包含需求讨论和规划
 ```
 
 ### 日常执行管理
 ```bash
-/autopilot-status --quick           # 快速检查状态
-/autopilot-execute                  # 继续执行任务
-/autopilot-context-refresh          # 定期刷新上下文
+/autopilot-status --quick  # 快速检查进度
+/autopilot-continue        # 智能继续执行（自动处理恢复等）
 ```
 
 ### 异常处理
 ```bash
-/autopilot-recovery --check         # 检查异常状态
-/autopilot-recovery --fix           # 自动修复问题
-/autopilot-status                   # 验证修复效果
+/autopilot-status          # 检查详细状态
+/autopilot-continue --recover  # 智能恢复执行
 ```
 
-### 需求变更
+### 需要帮助
 ```bash
-/autopilot-align --update           # 更新需求对齐
-/autopilot-plan --update            # 重新制定计划
-/autopilot-execute                  # 按新计划执行
+/autopilot-help            # 查看完整使用指南
+/autopilot-help --trouble  # 故障排除指南
 ```
 
-## 检查方面类型
+## 状态检查选项
 
-`/autopilot-status --aspect` 支持的类型：
-- `alignment` - 需求对齐状态
-- `progress` - 任务执行进度
-- `quality` - 质量指标状况
-- `health` - 系统健康状态
-- `decisions` - 决策记录分析
+`/autopilot-status` 支持的专门检查：
+- `--progress` - 仅显示任务执行进度
+- `--alignment` - 仅检查需求对齐状态
+- `--quality` - 仅显示质量指标
+- `--quick` - 快速概览所有信息
 
-## 使用技巧
+## 核心优势
 
-### 高效执行
-- 使用 `--quick` 选项进行快速操作
-- 定期运行 `/autopilot-context-refresh` 避免上下文丢失
-- 在重要节点后检查 `/autopilot-status`
+### 极简学习
+- **只需记住4个命令**，大幅降低学习成本
+- **智能自动化**，减少用户决策负担
+- **统一入口**，避免功能重叠和混淆
 
-### 问题排查
-- 先用 `/autopilot-recovery --check` 诊断问题
-- 根据诊断结果选择合适的恢复选项
-- 验证修复效果后再继续执行
+### 智能执行
+- **自动状态检测**，无需手动诊断
+- **智能恢复机制**，自动处理常见问题
+- **上下文自动管理**，无需担心对话长度
 
-### 质量保证
-- 定期检查 `/autopilot-align` 确保需求对齐
-- 关注质量评分趋势
-- 在偏离时及时调整执行策略
+### 需求导向
+- **持续需求对齐**，确保执行不偏离目标
+- **质量自动控制**，维持高标准的交付质量
+- **24小时无人值守**，支持长时间连续执行
 
-详细文档请参考：
-- [核心概念](../docs/concepts.md)
-- [工作流程详解](../docs/workflow.md)
-- [状态管理系统](../docs/state-management.md)
+**详细功能说明请运行：`/autopilot-help`**
