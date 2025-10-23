@@ -1,6 +1,6 @@
 {
   "name": "claude-code-autopilot",
-  "version": "2.0.0",
+  "version": "1.1.0",
   "description": "极简4命令设计，24小时无人值守执行系统 - 官方最佳实践架构，智能自动化执行",
   "author": {
     "name": "Claude Code AutoPilot Team",
